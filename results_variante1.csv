@@ -1,64 +1,66 @@
 Name + Institution,Email
-Bernhard Schätz fortiss GmbH,hoelzl@fortiss.orgAbstract
-John Baillieul Boston University,johnb@bu.edu
-Sam Nazari Draper Laboratory,sam.nazari.ctr@darpa.mil
-Ian O'Connor ‚Ecole Centrale de Lyon,ian.oconnor@ec-lyon.fr
-Alex Ohata Toyota Motor Company,marissa.borjon@toyota.com
-Luca De Nardis University of Rome La Sapienza,luca.denardis@uniroma1.it
-Zoran Filipi Clemson University,zfilipi@clemson.edu
-Stephen Koffman Boeing Satellite Systems,bcssmarketing@boeing.com
-Hugh T. Liu University of Toronto,pat.doherty@utoronto.ca
-Neeraj Magotra Western New England University,neeraj.magotra@wne.edu
-Taskin Padir Worcester Polytechnic Institute,t.padir@northeastern.edu
-Daniel Varro Budapest University of Tech. and Economics,daniel.varro@liu.se
-Justyna Zander Worcester Polytechnic Institute/MathWorks,dr.justyna.zander@gmail.com
-Florian Holzapfel Technical University of Munich,Florian.Holzapfel@tum.de
-Gunar Schirner Northeastern University,schirner@ece.northeastern.edu
-Hans Vangheluwe University of Antwerp/McGill University,hans.vangheluwe@uantwerp.be
-Qi Zhu University of California Riverside,qzhu@ece.ucr.edu
-William Milam Ford Motor Co,wmilam@ford.com
-Frank Allgöwer University of Stuttgart,frank.allgower@ist.uni-stuttgart.de
-Isaac Cohen UTRC,isaac.cohen@utrc.utc.com
 Soha Hassoun Tufts University,soha.hassoun@tufts.edu
-Tim Lüth Technical University of Munich,tim.lueth%40tum.de
-Krzysztof Czarnecki University of Waterloo,Krzysztof%20Czarnecki%20%3ck2czarne@uwaterloo.ca%3e
-Mark Lawford McMaster University,lawfordvivo7vivomcmaster.ca
-Lennart Ljung Linköping University,ljung_at_isy.liu.se
-Pete Manolios Northeastern University,pete@ccs.neu.edu
-Gabriela Nicolescu ‚Ecole Polytechnique de Montreal,gabriela.nicolescu@polymtl.ca
-Krishna R. Pattipati University of Connecticut,krishna.pattipati@uconn.edu
-Yan Wan University of North Texas,yan.wan@uta.edu
-Alan Wassyng McMaster University,wassyng@mcmaster.ca
-Michael Caramanis Boston University,mcaraman@bu.edu
-Peter Corke Queensland University of Technology,peter.corke@qut.edu.au
-Miriam Leeser Northeastern University,mel@ece.northeastern.edu
-Jan Madsen Technical University of Denmark,jama@dtu.dk
-Mohammad Al Faruque University of California Irvine,alfaruqu@uci.edu
-George Bollas University of Connecticut,george.bollas@uconn.edu
-Veronique Delebarre SafeRiver,veronique.delebarre@safe-river.com
-Marco Di Natale Scuola Superiore Sant'Anna,marco.dinataleg@sssup.itAbstract
-Andreas Naderlinger University of Salzburg,andreas.naderlinger@cs.uni-salzburg.at
-Dario Pompili Rutgers University,pompili@rutgers.edu
-David Wilson Auckland University of Technology,david.wilson@aut.ac.nz
-Russ Tedrake Massachusetts Institute of Technology,russt@csail.mit.edu
-Sayan Mitra University of Illinois at Urbana-Champaign,mitras@illinois.edu
-Ramesh Sethu General Motors,partnering@we-conect.com
-Ratnesh Kumar Iowa State University,rkumar@iastate.edu
-Sanjoy Baruah University of North Carolina at Chapel Hill,baruah@wustl.edu
-Ahmed Jerraya CEA Tech,ahmed.jerraya@cea.fr
-Usman Khan Tufts University,usman.khan@tufts.edu
-Christos Cassandras Boston University,cgc@bu.edu
 Oded Maler CNRS-VERIMAG University of Grenoble,CNRS-VERIMAGUniversityofGrenobleOded.Maler@imag.fr
-Laurent Michel University of Connecticut,laurent.michel@uconn.edu
-Miroslav Pajic University of Pennsylvania,miroslav.pajic@duke.edu
-Wolfgang Pree University of Salzburg,Wolfgang.Pree@cs.uni
-Ozer Unluhisarcikli ASML,ozer.unluhisarcikli@asml.com
-Sergey Yurgenson Harvard Medical School,sergey_yurgenson@hms.harvard.edu
+Krishna R. Pattipati University of Connecticut,krishna.pattipati@uconn.edu
+Krzysztof Czarnecki University of Waterloo,krzysztof.czarnecki@uwaterloo.ca
 Magnus Egerstedt Georgia Institute of Technology,magnus.egerstedt@ece.gatech.edu
-Pau-Lo Hsu National Chiao-Tung University,plhsu@mail.nctu.edu.tw
-Alexandru Mereacre University of Oxford,Alexandru.Mereacreg@cs.ox.ac.ukDepartmentofComputerScience
+Mark Lawford McMaster University,lawford@mcmaster.ca
 Mark Spong The University of Texas at Dallas,mspong@utdallas.edu
-Reza Emami University of Toronto,reza.emami@utoronto.ca
+Mohammad Al Faruque University of California Irvine,alfaruqu@uci.edu
+Stephen Koffman Boeing Satellite Systems,bcssmarketing@boeing.com
+Alexandru Mereacre University of Oxford,Alexandru.Mereacreg@cs.ox.ac.ukDepartmentofComputerScience
+Sergey Yurgenson Harvard Medical School,sergey_yurgenson@hms.harvard.edu
+Miriam Leeser Northeastern University,mel@ece.northeastern.edu
+Mary Ann Maher SoftMEMS LLC,maryann@softmems.com
+William Milam Ford Motor Co,wmilam@ford.com
+Bernhard Schätz fortiss GmbH,hoelzl@fortiss.orgAbstract
+Ozer Unluhisarcikli ASML,ozer.unluhisarcikli@asml.com
+John Baillieul Boston University,johnb@bu.edu
+Veronique Delebarre SafeRiver,veronique.delebarre@safe-river.com
+Florian Holzapfel Technical University of Munich,florian.holzapfel@tum.de
+Ahmed Jerraya CEA Tech,Programahmed.jerraya@cea.fr
+Wisam Kadhim ASML,tue.nlCompanySupervisorsKeesKotterinkkees.kotterink@asml.comSvenWebersven.weber
+Usman Khan Tufts University,usman.khan@tufts.edu
+Sayan Mitra University of Illinois at Urbana-Champaign,mitras@illinois.edu
+Alan Wassyng McMaster University,wassyng@mcmaster.ca
+Isaac Cohen UTRC,isaac.cohen@utrc.utc.com
+Zoran Filipi Clemson University,Emerituszfilipi@clemson.edu
+Jan Madsen Technical University of Denmark,jan@imm.dtu.dk
+Laurent Michel University of Connecticut,Emaillaurent.michel@uconn.edu
+Charles Taylor University of Louisiana at Lafayette,professorctaylor@louisiana.edu
+Russ Tedrake Massachusetts Institute of Technology,russt@mit.edu
+Hans Vangheluwe University of Antwerp/McGill University,Hans.Vangheluwe@uantwerp.be
+Peter Corke Queensland University of Technology,peter.corke@qut.edu.au
+Luca De Nardis University of Rome La Sapienza,luca.denardis@uniroma1.it
+Sam Nazari Draper Laboratory,sam.nazari@gmail.com
+Miroslav Pajic University of Pennsylvania,miroslav.pajic@duke.edu
+Ramesh Sethu General Motors,partnering@we-conect.com
+Frank Allgöwer University of Stuttgart,frank.allgower@ist.uni-stuttgart.de
+Christos Cassandras Boston University,cgc@bu.edu
+Pau-Lo Hsu National Chiao-Tung University,plhsu@mail.nctu.edu
+Alex Ohata Toyota Motor Company,edward.hellwig@toyota.com
+Dario Pompili Rutgers University,pompili@rutgers.edu
+Wolfgang Pree University of Salzburg,Wolfgang.Pree@cs.uni
+Sanjoy Baruah University of North Carolina at Chapel Hill,baruah@wustl.edu
+George Bollas University of Connecticut,Emailgeorge.bollas@uconn.edu
 Zhihao Jiang University of Pennsylvania,zhihaoj@seas.upenn.edu
-Frank Slomka Ulm University,frank.slomka@uni-ulm.de
-Charles Taylor University of Louisiana at Lafayette,ctaylor@louisiana.edu
+Lennart Ljung Linköping University,lennart.ljung@liu.se
+Frank Slomka Ulm University,kilian.kempfg@uni-ulm.deAbstract.Designingcyber-physicalsystemsisachallengeoriginatingfromthemultidisciplinaryandmixed-signalrequirements.Inordertohandlethischallenge
+Daniel Varro Budapest University of Tech. and Economics,varro@mit.bme.hu
+Marco Di Natale Scuola Superiore Sant'Anna,marco@sssup.it
+Reza Emami University of Toronto,reza.emami@utoronto.ca
+Ratnesh Kumar Iowa State University,rkumar@iastate.edu
+Hugh T. Liu University of Toronto,pat.doherty@utoronto.ca
+Pete Manolios Northeastern University,pete@ccs.neu.edu
+David Wilson Auckland University of Technology,david.wilson@aut.ac.nz
+Michael Caramanis Boston University,mcaraman@bu.edu
+Tim Lüth Technical University of Munich,tim.lueth%40tum.de
+Andreas Naderlinger University of Salzburg,andreas.naderlinger@cs.uni-salzburg.at
+Gunar Schirner Northeastern University,schirner@ece.northeastern.edu
+Neeraj Magotra Western New England University,neeraj.magotra@wne.edu
+Yan Wan University of North Texas,yan.wan@uta.edu
+Qi Zhu University of California Riverside,qzhu@ece.ucr.edu
+Gabriela Nicolescu ‚Ecole Polytechnique de Montreal,gabriela.nicolescu@polymtl.ca
+Ian O'Connor ‚Ecole Centrale de Lyon,ian.oconnor@ec-lyon.fr
+Taskin Padir Worcester Polytechnic Institute,t.padir@northeastern.edu
+Justyna Zander Worcester Polytechnic Institute/MathWorks,dr.justyna.zander@gmail.com

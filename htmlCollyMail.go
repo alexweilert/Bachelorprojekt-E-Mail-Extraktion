@@ -3,62 +3,96 @@ package main
 import (
 	"fmt"
 	"github.com/gocolly/colly"
+	"math/rand"
+	"net/mail"
 	"regexp"
 	"strings"
+	"time"
 )
 
-func ExtractEmailWithColly(url, name string) (string, int, error) {
+func ExtractEmailWithColly(url string, name string) (string, int, error) {
 	c := colly.NewCollector(
-		colly.UserAgent("Mozilla/5.0"),
+		colly.UserAgent(""),
 	)
 
-	var foundEmail string
+	c.Limit(&colly.LimitRule{
+		DomainGlob:  "*",             // Gilt für alle Domains
+		Delay:       2 * time.Second, // Fester Delay von 2 Sekunden
+		RandomDelay: 1 * time.Second, // Zufälliger Zusatzdelay von bis zu 1 Sekunde
+	})
+
+	userAgents := []string{
+		"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+		"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15",
+		"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+		"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:115.0) Gecko/20100101 Firefox/115.0",
+		"Mozilla/5.0 (iPhone; CPU iPhone OS 16_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.2 Mobile/15E148 Safari/604.1",
+	}
+	rand.Seed(time.Now().UnixNano())
+
+	c.OnRequest(func(r *colly.Request) {
+		ua := userAgents[rand.Intn(len(userAgents))]
+		r.Headers.Set("User-Agent", ua)
+		fmt.Println("[COLLY] Verwende User-Agent:", ua)
+	})
+
+	c.OnResponse(func(r *colly.Response) {
+		fmt.Println("[DEBUG] Antwort erhalten von", r.Request.URL)
+		fmt.Println("[DEBUG] Gesendeter User-Agent:", r.Request.Headers.Get("User-Agent"))
+	})
+
 	emailPattern := regexp.MustCompile(`(?i)\b[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}\b`)
 	allEmails := make(map[string]bool)
-
-	firstName, middleName, lastName := extractNameParts(name)
+	var bestEmail string
 	highestScore := -1
 
+	firstName, middleName, lastName := extractNameParts(name)
+	blacklist := []string{
+		"info@", "contact@", "webmaster@", "noreply@", "support@",
+		"enquiries@", "communications@", "press@", "postmaster@",
+		"maintainer@", "marketing@", "speaking@", "partnering@",
+	}
+
+	checkAndAddEmail := func(email string) {
+		clean := sanitizeEmail(email)
+		if clean == "" {
+			return
+		}
+		cleanLower := strings.ToLower(clean)
+
+		// Blacklist-Check
+		for _, b := range blacklist {
+			if strings.Contains(cleanLower, b) {
+				return
+			}
+		}
+
+		score := getScore(cleanLower, firstName, middleName, lastName)
+		fmt.Printf("[COLLY] %s → Score: %d\n", clean, score)
+
+		allEmails[clean] = true
+		if score > highestScore {
+			bestEmail = clean
+			highestScore = score
+		}
+	}
+
+	// Body scan
 	c.OnHTML("body", func(e *colly.HTMLElement) {
-		matches := emailPattern.FindAllString(e.Text, -1)
-		for _, match := range matches {
-			email := strings.ToLower(strings.TrimSpace(strings.TrimRight(match, ".;, \t\n\r\"'›»")))
-
-			if strings.Contains(email, " ") || strings.Count(email, "@") != 1 {
-				continue
-			}
-			if idx := strings.Index(email, "@"); idx > 0 {
-				if strings.ContainsAny(email[:idx], "0123456789") {
-					continue
-				}
-			}
-
-			score := getScore(email, firstName, middleName, lastName)
-			fmt.Printf("[COLLY] %s → Score: %d\n", email, score)
-			allEmails[email] = true
-
-			if score > highestScore {
-				foundEmail = email
-				highestScore = score
-			}
+		for _, match := range emailPattern.FindAllString(e.Text, -1) {
+			checkAndAddEmail(match)
 		}
 	})
 
+	// mailto: links
 	c.OnHTML("a[href^='mailto:']", func(e *colly.HTMLElement) {
-		raw := strings.TrimPrefix(e.Attr("href"), "mailto:")
-		matches := emailPattern.FindAllString(raw, -1)
-		for _, match := range matches {
-			email := strings.ToLower(strings.TrimSpace(strings.TrimRight(match, ".;, \t\n\r\"'›»")))
-			if strings.Contains(email, " ") || strings.Count(email, "@") != 1 {
-				continue
-			}
-			score := getScore(email, firstName, middleName, lastName)
-			fmt.Printf("[COLLY-mailto] %s → Score: %d\n", email, score)
-			allEmails[email] = true
+		text := e.Text
+		href := strings.TrimPrefix(e.Attr("href"), "mailto:")
 
-			if score > highestScore {
-				foundEmail = email
-				highestScore = score
+		sources := []string{href, text}
+		for _, src := range sources {
+			for _, match := range emailPattern.FindAllString(src, -1) {
+				checkAndAddEmail(match)
 			}
 		}
 	})
@@ -68,18 +102,54 @@ func ExtractEmailWithColly(url, name string) (string, int, error) {
 		return "", 0, err
 	}
 
-	// Fallback, falls keine bewertete E-Mail
-	if foundEmail == "" {
+	// Fallback: gib erste gültige E-Mail zurück
+	if bestEmail == "" {
 		for email := range allEmails {
-			foundEmail = email
+			bestEmail = email
 			highestScore = 0
 			break
 		}
 	}
 
-	if foundEmail == "" {
-		return "", 0, fmt.Errorf("keine passende E-Mail gefunden (Colly)")
+	if bestEmail == "" {
+		return "", 0, fmt.Errorf("keine E-Mail extrahiert")
 	}
 
-	return foundEmail, highestScore, nil
+	return bestEmail, highestScore, nil
+}
+
+// Entfernt unerwünschte Zeichen & schneidet nach TLD sauber ab
+func sanitizeEmail(raw string) string {
+	clean := strings.TrimSpace(raw)
+	clean = strings.ReplaceAll(clean, "%40", "@")
+	clean = strings.TrimRight(clean, ".;, \t\n\r\"'›»")
+
+	if strings.Count(clean, "@") != 1 || strings.Contains(clean, " ") {
+		return ""
+	}
+
+	idx := strings.Index(clean, "@")
+	if idx == -1 || strings.ContainsAny(clean[:idx], "0123456789") {
+		return ""
+	}
+
+	// Schneide nach offizieller TLD sauber ab (falls nötig)
+	clean = truncateEmailAfterTLD(clean)
+
+	// Validierung mit net/mail
+	if _, err := mail.ParseAddress(clean); err != nil {
+		return ""
+	}
+
+	return clean
+}
+
+// Trunkiert alles nach einer gültigen Domain-Endung wie .edu, .it etc.
+func truncateEmailAfterTLD(email string) string {
+	tldPattern := regexp.MustCompile(`(?i)(@[\w\.\-]+\.(edu|com|org|net|gov|ca|de|uk|au|ch|fr|be|it|nl))`)
+	loc := tldPattern.FindStringIndex(email)
+	if loc != nil {
+		return email[:loc[1]]
+	}
+	return email
 }

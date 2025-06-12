@@ -39,7 +39,12 @@ func ExtractEmailFromURL(url string, name string) (string, int, error) {
 	}
 
 	firstName, middleName, lastName := extractNameParts(name)
-	blacklist := []string{"webmaster@", "info@", "contact@", "support@", "noreply@", "maintainer@"}
+	blacklist := []string{
+		"info@", "contact@", "webmaster@", "noreply@", "support@",
+		"enquiries@", "communications@", "press@", "postmaster@",
+		"maintainer@", "marketing@", "speaking@", "partnering@",
+	}
+
 	highestScore := -1
 	var bestEmail string
 
@@ -54,7 +59,6 @@ func ExtractEmailFromURL(url string, name string) (string, int, error) {
 		skip := false
 		for _, b := range blacklist {
 			if strings.Contains(mailLower, b) {
-				fmt.Printf("[IGNORIERT] %s → Blacklist\n", mail)
 				skip = true
 				break
 			}
@@ -89,8 +93,6 @@ func ExtractEmailFromURL(url string, name string) (string, int, error) {
 			fmt.Println("[KEIN TREFFER] Keine passende E-Mail gefunden.")
 			return "", 0, fmt.Errorf("keine gültige Adresse extrahiert")
 		}
-	} else {
-		fmt.Printf("[AUSGEWÄHLT] Beste Adresse: %s (Score: %d)\n", bestEmail, highestScore)
 	}
 
 	return bestEmail, highestScore, nil

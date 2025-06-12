@@ -6,6 +6,14 @@ func getScore(email, firstName, middleName, lastName string) int {
 	email = strings.ToLower(email)
 	score := 0
 
+	if strings.Contains(firstName, "ä") {
+		strings.Replace(email, "ä", "ae", 1)
+	}
+
+	if strings.Contains(email, "ö") {
+		strings.Replace(email, "ö", "oe", 1)
+	}
+
 	// 1. Direkte Matches (4 Punkte)
 	if firstName != "" && strings.Contains(email, firstName) {
 		score += 4

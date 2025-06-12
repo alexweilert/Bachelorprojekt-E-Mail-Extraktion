@@ -17,87 +17,64 @@ func main() {
 
 	fmt.Println("🔢 Anzahl geladener Zeilen:", len(entries))
 	for i, entry := range entries {
-		fmt.Printf("\n➡️ [%d/%d] Suche nach: %s\n", i+1, len(entries), entry)
+		contactQuery := entry + " contact"
+		fmt.Printf("\n➡️ [%d/%d] Suche nach: %s\n", i+1, len(entries), contactQuery)
 
-		fmt.Println("Searching for:", entry)
-		links, err := DuckDuckGoSearch(entry)
+		fmt.Println("Searching for:", contactQuery)
+		links, err := DuckDuckGoSearch(contactQuery)
 		if err != nil || len(links) == 0 {
-			fmt.Println("⚠️ DuckDuckGo fehlgeschlagen – Bing wird verwendet.")
-			links, err = BingSearch(entry)
+			fmt.Println("⚠️ DuckDuckGo fehlgeschlagen, versuche es später erneut.")
 		}
 
 		bestEmail := ""
 		bestScore := -1
-
-		var lastEmail string
+		lastEmail := ""
 		sameEmailStreak := 0
 		emailScores := make(map[string]int)
 
+		// 1️⃣ Colly zuerst
 		for _, link := range links {
-
-			fmt.Println("Untersuche Link:", link)
-			email, score, err := ExtractEmailFromURL(link, entry)
+			fmt.Println("→ Colly prüft:", link)
+			email, score, err := ExtractEmailWithColly(link, contactQuery)
 			if err != nil || email == "" {
 				continue
 			}
 
-			// Score-Tracking
-			if score > emailScores[email] {
-				emailScores[email] = score
-			}
-
-			// Vergleich mit vorheriger E-Mail
-			if email == lastEmail {
-				sameEmailStreak++
-			} else {
-				sameEmailStreak = 1
-				lastEmail = email
-			}
-
-			// Update best match
-			if emailScores[email] > bestScore {
-				bestEmail = email
-				bestScore = emailScores[email]
-			}
-
-			if score >= 5 {
-				fmt.Println("[Treffer] Sehr gute Übereinstimmung → abbrechen")
-				break
-			}
-
-			// ❗Abbruch: zweimal hintereinander identisch
-			if sameEmailStreak >= 2 {
-				fmt.Printf("[Abbruch] %s zweimal hintereinander gefunden → übernommen.\n", email)
-				bestEmail = email // endgültig übernehmen
+			if updateBestEmail(email, score, &lastEmail, &sameEmailStreak, &bestEmail, &bestScore, emailScores) || score >= 5 {
 				break
 			}
 		}
 
-		// Am Ende:
+		// 2️⃣ chromedp nur wenn nötig
 		if bestEmail == "" || (bestScore <= 4 && sameEmailStreak <= 1) {
-			fmt.Printf("❌ Keine passende E-Mail gefunden für: %s\n", entry)
-		} else {
-			results[entry] = bestEmail
+			for _, link := range links {
+				fmt.Println("→ chromedp prüft:", link)
+				email, score, err := ExtractEmailFromURL(link, contactQuery)
+				if err != nil || email == "" {
+					continue
+				}
+
+				if updateBestEmail(email, score, &lastEmail, &sameEmailStreak, &bestEmail, &bestScore, emailScores) || score >= 5 {
+					break
+				}
+			}
 		}
 
-		// Wenn keine E-Mail gefunden: Fallback mit "E-Mail"-Query
+		// 3️⃣ Fallback-Suche mit Query
 		if bestEmail == "" || (bestScore <= 4 && sameEmailStreak <= 1) {
 			fallbackQuery := entry + " email address"
 			fmt.Println("🔁 Starte Fallback-Suche mit:", fallbackQuery)
 
 			fallbackLinks, err := DuckDuckGoSearch(fallbackQuery)
 			if err != nil || len(fallbackLinks) == 0 {
-				fmt.Println("⚠️ DuckDuckGo-Fallback fehlgeschlagen – Bing wird verwendet.")
-				fallbackLinks, err = BingSearch(fallbackQuery)
+				fmt.Println("⚠️ DuckDuckGo-Fallback fehlgeschlagen, versuche es später erneut.")
 			}
 			if err == nil {
 				for _, link := range fallbackLinks {
 					fmt.Println("Untersuche Fallback-Link:", link)
 					email, score, err := ExtractEmailFromURL(link, entry)
-					if err == nil && email != "" && score > bestScore {
-						bestEmail = email
-						bestScore = score
-						if score >= 5 {
+					if err == nil && email != "" {
+						if updateBestEmail(email, score, &lastEmail, &sameEmailStreak, &bestEmail, &bestScore, emailScores) || score >= 5 {
 							break
 						}
 					}
@@ -105,21 +82,7 @@ func main() {
 			}
 		}
 
-		// 🧵 Colly-Fallback
-		if bestEmail == "" || (bestScore <= 4 && sameEmailStreak <= 1) {
-			fmt.Println("🔁 Vorletzter Versuch: Colly-basierte E-Mail-Extraktion")
-			for _, link := range links {
-				fmt.Println("→ Colly prüft:", link)
-				email, score, err := ExtractEmailWithColly(link, entry)
-				if err == nil && email != "" {
-					bestEmail = email
-					bestScore = score
-					break
-				}
-			}
-		}
-
-		// Als letzte Option: PDF-Alternative
+		// 4️⃣ PDF-Suche als letzte Option
 		if bestEmail == "" || (bestScore <= 4 && sameEmailStreak <= 1) {
 			fmt.Println("📄 Letzter Versuch PDF-basierte Suche")
 			pdfLinks, err := DuckDuckGoPDFSearch(entry)
@@ -129,10 +92,10 @@ func main() {
 					err := DownloadPDF(pdfURL, filename)
 					if err == nil {
 						email, score, err := ExtractEmailsFromPDF(filename, entry)
-						if err == nil && email != "" && score > bestScore {
-							bestEmail = email
-							bestScore = score
-							break
+						if err == nil && email != "" {
+							if updateBestEmail(email, score, &lastEmail, &sameEmailStreak, &bestEmail, &bestScore, emailScores) || score >= 5 {
+								break
+							}
 						}
 					}
 				}
@@ -148,11 +111,44 @@ func main() {
 		}
 	}
 
-	// CSV schreiben
 	err = WriteCSV(outputFile, results)
 	if err != nil {
 		panic(err)
 	}
 
 	fmt.Println("✅ Results written to", outputFile)
+}
+
+func updateBestEmail(
+	email string,
+	score int,
+	lastEmail *string,
+	sameEmailStreak *int,
+	bestEmail *string,
+	bestScore *int,
+	emailScores map[string]int,
+) bool {
+
+	if score > emailScores[email] {
+		emailScores[email] = score
+	}
+
+	if email == *lastEmail && score > 0 {
+		*sameEmailStreak++
+	} else {
+		*sameEmailStreak = 1
+		*lastEmail = email
+	}
+
+	if emailScores[email] > *bestScore {
+		*bestEmail = email
+		*bestScore = emailScores[email]
+	}
+
+	if *sameEmailStreak >= 4 && *bestScore >= 3 {
+		fmt.Printf("[Abbruch] %s dreimal hintereinander gefunden → übernommen.\n", email)
+		return true
+	}
+
+	return false
 }

@@ -1,13 +1,11 @@
 package main
 
 import (
+	"github.com/ledongthuc/pdf"
 	"io"
 	"net/http"
 	"os"
 	"regexp"
-	"strings"
-
-	"github.com/ledongthuc/pdf"
 )
 
 func DownloadPDF(url string, filename string) error {
@@ -27,7 +25,6 @@ func DownloadPDF(url string, filename string) error {
 	return err
 }
 
-// ExtractEmailsFromPDF PDF-Suche: bewertet jede E-Mail und gibt beste mit Score zurück
 func ExtractEmailsFromPDF(filepath string, name string) (string, int, error) {
 	f, r, err := pdf.Open(filepath)
 	if err != nil {
@@ -48,17 +45,20 @@ func ExtractEmailsFromPDF(filepath string, name string) (string, int, error) {
 		if err != nil {
 			continue
 		}
-		found := emailPattern.FindAllString(content, -1)
-		for _, email := range found {
-			clean := strings.TrimSpace(email)
-			allEmails[clean] = true
+		rawMatches := emailPattern.FindAllString(content, -1)
+		for _, raw := range rawMatches {
+			clean := sanitizeEmail(raw)
+			if clean != "" {
+				allEmails[clean] = true
+			}
 		}
 	}
 
-	// Scoring
+	// Scoring: beste E-Mail anhand Namen wählen
 	var bestEmail string
 	bestScore := -1
 	firstName, middleName, lastName := extractNameParts(name)
+
 	for email := range allEmails {
 		score := getScore(email, firstName, middleName, lastName)
 		if score > bestScore {
