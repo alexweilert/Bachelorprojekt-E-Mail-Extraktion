@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"strings"
 
 	"github.com/ledongthuc/pdf"
 )
@@ -26,15 +27,16 @@ func DownloadPDF(url string, filename string) error {
 	return err
 }
 
-func ExtractEmailsFromPDF(filepath string) ([]string, error) {
+// ExtractEmailsFromPDF PDF-Suche: bewertet jede E-Mail und gibt beste mit Score zurück
+func ExtractEmailsFromPDF(filepath string, name string) (string, int, error) {
 	f, r, err := pdf.Open(filepath)
 	if err != nil {
-		return nil, err
+		return "", 0, err
 	}
 	defer f.Close()
 
-	var emails []string
 	emailPattern := regexp.MustCompile(`(?i)[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}`)
+	allEmails := make(map[string]bool)
 
 	totalPage := r.NumPage()
 	for i := 1; i <= totalPage; i++ {
@@ -47,7 +49,26 @@ func ExtractEmailsFromPDF(filepath string) ([]string, error) {
 			continue
 		}
 		found := emailPattern.FindAllString(content, -1)
-		emails = append(emails, found...)
+		for _, email := range found {
+			clean := strings.TrimSpace(email)
+			allEmails[clean] = true
+		}
 	}
-	return emails, nil
+
+	// Scoring
+	var bestEmail string
+	bestScore := -1
+	firstName, middleName, lastName := extractNameParts(name)
+	for email := range allEmails {
+		score := getScore(email, firstName, middleName, lastName)
+		if score > bestScore {
+			bestEmail = email
+			bestScore = score
+		}
+	}
+
+	if bestEmail == "" {
+		return "", 0, nil
+	}
+	return bestEmail, bestScore, nil
 }

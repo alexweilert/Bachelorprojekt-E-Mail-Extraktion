@@ -26,18 +26,63 @@ func main() {
 			links, err = BingSearch(entry)
 		}
 
-		var email string
+		bestEmail := ""
+		bestScore := -1
+
+		var lastEmail string
+		sameEmailStreak := 0
+		emailScores := make(map[string]int)
+
 		for _, link := range links {
+
 			fmt.Println("Untersuche Link:", link)
-			email, err = ExtractEmailFromURL(link, entry)
-			if err == nil && email != "" {
+			email, score, err := ExtractEmailFromURL(link, entry)
+			if err != nil || email == "" {
+				continue
+			}
+
+			// Score-Tracking
+			if score > emailScores[email] {
+				emailScores[email] = score
+			}
+
+			// Vergleich mit vorheriger E-Mail
+			if email == lastEmail {
+				sameEmailStreak++
+			} else {
+				sameEmailStreak = 1
+				lastEmail = email
+			}
+
+			// Update best match
+			if emailScores[email] > bestScore {
+				bestEmail = email
+				bestScore = emailScores[email]
+			}
+
+			if score >= 5 {
+				fmt.Println("[Treffer] Sehr gute Übereinstimmung → abbrechen")
+				break
+			}
+
+			// ❗Abbruch: zweimal hintereinander identisch
+			if sameEmailStreak >= 2 {
+				fmt.Printf("[Abbruch] %s zweimal hintereinander gefunden → übernommen.\n", email)
+				bestEmail = email // endgültig übernehmen
 				break
 			}
 		}
 
-		// Wenn keine E-Mail gefunden: Fallback mit "email"-Query
-		if email == "" {
-			fallbackQuery := entry + " email adress"
+		// Am Ende:
+		if bestEmail == "" || (bestScore <= 4 && sameEmailStreak <= 1) {
+			fmt.Printf("❌ Keine passende E-Mail gefunden für: %s\n", entry)
+		} else {
+			results[entry] = bestEmail
+		}
+
+		// Wenn keine E-Mail gefunden: Fallback mit "E-Mail"-Query
+		if bestEmail == "" || (bestScore <= 4 && sameEmailStreak <= 1) {
+			fallbackQuery := entry + " email address"
 			fmt.Println("🔁 Starte Fallback-Suche mit:", fallbackQuery)
 
 			fallbackLinks, err := DuckDuckGoSearch(fallbackQuery)
@@ -48,26 +93,11 @@ func main() {
 			if err == nil {
 				for _, link := range fallbackLinks {
 					fmt.Println("Untersuche Fallback-Link:", link)
-					email, err = ExtractEmailFromURL(link, entry)
-					if err == nil && email != "" {
-						break
-					}
-				}
-			}
-		}
-
-		// Wenn weiterhin nichts gefunden: PDF-Alternative
-		if email == "" {
-			fmt.Println("📄 Versuche PDF-basierte Suche")
-			pdfLinks, err := DuckDuckGoPDFSearch(entry)
-			if err == nil && len(pdfLinks) > 0 {
-				for _, pdfURL := range pdfLinks {
-					filename := "temp.pdf"
-					err := DownloadPDF(pdfURL, filename)
-					if err == nil {
-						emails, err := ExtractEmailsFromPDF(filename)
-						if err == nil && len(emails) > 0 {
-							email = emails[0]
+					email, score, err := ExtractEmailFromURL(link, entry)
+					if err == nil && email != "" && score > bestScore {
+						bestEmail = email
+						bestScore = score
+						if score >= 5 {
 							break
 						}
 					}
@@ -75,18 +105,54 @@ func main() {
 			}
 		}
 
-		if email == "" {
-			fmt.Printf("Keine passende E-Mail gefunden für: %s\n", entry)
+		// 🧵 Colly-Fallback
+		if bestEmail == "" || (bestScore <= 4 && sameEmailStreak <= 1) {
+			fmt.Println("🔁 Vorletzter Versuch: Colly-basierte E-Mail-Extraktion")
+			for _, link := range links {
+				fmt.Println("→ Colly prüft:", link)
+				email, score, err := ExtractEmailWithColly(link, entry)
+				if err == nil && email != "" {
+					bestEmail = email
+					bestScore = score
+					break
+				}
+			}
+		}
+
+		// Als letzte Option: PDF-Alternative
+		if bestEmail == "" || (bestScore <= 4 && sameEmailStreak <= 1) {
+			fmt.Println("📄 Letzter Versuch PDF-basierte Suche")
+			pdfLinks, err := DuckDuckGoPDFSearch(entry)
+			if err == nil && len(pdfLinks) > 0 {
+				for _, pdfURL := range pdfLinks {
+					filename := "temp.pdf"
+					err := DownloadPDF(pdfURL, filename)
+					if err == nil {
+						email, score, err := ExtractEmailsFromPDF(filename, entry)
+						if err == nil && email != "" && score > bestScore {
+							bestEmail = email
+							bestScore = score
+							break
+						}
+					}
+				}
+			}
+		}
+
+		// Ergebnis-Ausgabe
+		if bestEmail == "" || (bestScore <= 4 && sameEmailStreak <= 1) {
+			fmt.Printf("❌ Keine passende E-Mail gefunden für: %s\n", entry)
 		} else {
-			results[entry] = email
-			fmt.Printf("Found: %s => %s\n", entry, email)
+			results[entry] = bestEmail
+			fmt.Printf("✅ Found: %s => %s (Score: %d)\n", entry, bestEmail, bestScore)
 		}
 	}
 
+	// CSV schreiben
 	err = WriteCSV(outputFile, results)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println("Results written to", outputFile)
+	fmt.Println("✅ Results written to", outputFile)
 }

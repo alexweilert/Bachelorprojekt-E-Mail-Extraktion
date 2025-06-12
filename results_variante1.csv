@@ -1,68 +1,64 @@
 Name + Institution,Email
-Zhihao Jiang University of Pennsylvania,zhihaoj@seas.upenn.edu
-Kurt N. Ochsie Boeing Co,media@boeing.com
-George Bollas University of Connecticut,george.bollas@uconn.edu
-Oded Maler CNRS-VERIMAG University of Grenoble,God@heaven.org
-Alex Ohata Toyota Motor Company,marissa.borjon@toyota.com
-Russ Tedrake Massachusetts Institute of Technology,russt@csail.mit.edu
-Jan Madsen Technical University of Denmark,jama@dtu.dk
-Krishna R. Pattipati University of Connecticut,krishna.pattipati@uconn.edu
-Frank Allgöwer University of Stuttgart,frank.allgower@ist.uni-stuttgart.de
-Michael Caramanis Boston University,mcaraman@bu.edu
-William Milam Ford Motor Co,wmilam@ford.com
-Andreas Naderlinger University of Salzburg,andreas.naderlinger@cs.uni-salzburg.at
-Wolfgang Pree University of Salzburg,webmaster@cosy.sbg.ac.at
-Bernhard Schätz fortiss GmbH,info@fortiss.org
-Veronique Delebarre SafeRiver,presse@serma.com
-Justyna Zander Worcester Polytechnic Institute/MathWorks,dr.justyna.zander@gmail.com
+Bernhard Schätz fortiss GmbH,hoelzl@fortiss.orgAbstract
 John Baillieul Boston University,johnb@bu.edu
-Charles Taylor University of Louisiana at Lafayette,ctaylor@louisiana.edu
-Hans Vangheluwe University of Antwerp/McGill University,hv@cs.mcgill.ca
-Alexander M. Wylginski Worcester Polytechnic Institute,terric@wpi.edu
-Ahmed Jerraya CEA Tech,mpsoc10@vlsilab.ics.es.osaka-u.ac.jp
-Usman Khan Tufts University,usman.khan@tufts.edu
-Mary Ann Maher SoftMEMS LLC,wavering@nist.gov
-Mohammad Al Faruque University of California Irvine,alfaruqu@uci.edu
-Miriam Leeser Northeastern University,mel@ece.northeastern.edu
-Neeraj Magotra Western New England University,neeraj.magotra@wne.edu
-Pete Manolios Northeastern University,pete@ccs.neu.edu
+Sam Nazari Draper Laboratory,sam.nazari.ctr@darpa.mil
 Ian O'Connor ‚Ecole Centrale de Lyon,ian.oconnor@ec-lyon.fr
-Gunar Schirner Northeastern University,schirner@ece.northeastern.edu
-David Wilson Auckland University of Technology,sergiy.klymchuk@aut.ac.nz
-Sergey Yurgenson Harvard Medical School,sergey_yurgenson@hms.harvard.edu
-Marco Di Natale Scuola Superiore Sant'Anna,protocollo@sssup.legalmailpa.it
-Reza Emami University of Toronto,communications@utias.utoronto.ca
-Soha Hassoun Tufts University,soha.hassoun@tufts.edu
-Zoran Filipi Clemson University,automotive@clemson.edu
-Stephen Koffman Boeing Satellite Systems,bcssmarketing@boeing.com
-Taskin Padir Worcester Polytechnic Institute,t.padir@northeastern.edu
-Qi Zhu University of California Riverside,ecegradoffice@ece.ucr.edu
-Mark Spong The University of Texas at Dallas,mspong@utdallas.edu
-Peter Corke Queensland University of Technology,peter.corke@qut.edu.au
+Alex Ohata Toyota Motor Company,marissa.borjon@toyota.com
 Luca De Nardis University of Rome La Sapienza,luca.denardis@uniroma1.it
-Tim Lüth Technical University of Munich,professorenprofile@tum.de
-Alexandru Mereacre University of Oxford,mereacreg@cs.ox.ac.ukAbstract.Inmanyreal
-Miroslav Pajic University of Pennsylvania,miroslav.pajic@duke.edu
-Frank Slomka Ulm University,Germanybenjamin.menhorn@uni-ulm.de
-Yan Wan University of North Texas,shengli.fu@unt.edu
-Krzysztof Czarnecki University of Waterloo,k2czarne@uwaterloo.ca
-Sam Nazari Draper Laboratory,support@leadnear.com
-Ramesh Sethu General Motors,copetas@cs.cmu.edu
-Sanjoy Baruah University of North Carolina at Chapel Hill,baruah@wustl.edu
-Wisam Kadhim ASML,repository@rit.edu
-Ratnesh Kumar Iowa State University,rkumar@iastate.edu
+Zoran Filipi Clemson University,zfilipi@clemson.edu
+Stephen Koffman Boeing Satellite Systems,bcssmarketing@boeing.com
+Hugh T. Liu University of Toronto,pat.doherty@utoronto.ca
+Neeraj Magotra Western New England University,neeraj.magotra@wne.edu
+Taskin Padir Worcester Polytechnic Institute,t.padir@northeastern.edu
+Daniel Varro Budapest University of Tech. and Economics,daniel.varro@liu.se
+Justyna Zander Worcester Polytechnic Institute/MathWorks,dr.justyna.zander@gmail.com
+Florian Holzapfel Technical University of Munich,Florian.Holzapfel@tum.de
+Gunar Schirner Northeastern University,schirner@ece.northeastern.edu
+Hans Vangheluwe University of Antwerp/McGill University,hans.vangheluwe@uantwerp.be
+Qi Zhu University of California Riverside,qzhu@ece.ucr.edu
+William Milam Ford Motor Co,wmilam@ford.com
+Frank Allgöwer University of Stuttgart,frank.allgower@ist.uni-stuttgart.de
+Isaac Cohen UTRC,isaac.cohen@utrc.utc.com
+Soha Hassoun Tufts University,soha.hassoun@tufts.edu
+Tim Lüth Technical University of Munich,tim.lueth%40tum.de
+Krzysztof Czarnecki University of Waterloo,Krzysztof%20Czarnecki%20%3ck2czarne@uwaterloo.ca%3e
 Mark Lawford McMaster University,lawfordvivo7vivomcmaster.ca
-Hugh T. Liu University of Toronto,liu@utias.utoronto.ca
-Lennart Ljung Linköping University,lennart.ljung@liu.se
-Ozer Unluhisarcikli ASML,ozer.unluhisarcikli@asml.com
-Daniel Varro Budapest University of Tech. and Economics,varro@mit.bme.hu
-Florian Holzapfel Technical University of Munich,professorenprofile@tum.de
+Lennart Ljung Linköping University,ljung_at_isy.liu.se
+Pete Manolios Northeastern University,pete@ccs.neu.edu
 Gabriela Nicolescu ‚Ecole Polytechnique de Montreal,gabriela.nicolescu@polymtl.ca
-Dario Pompili Rutgers University,pompili@rutgers.edu
+Krishna R. Pattipati University of Connecticut,krishna.pattipati@uconn.edu
+Yan Wan University of North Texas,yan.wan@uta.edu
 Alan Wassyng McMaster University,wassyng@mcmaster.ca
-Christos Cassandras Boston University,cgc@bu.edu
-Isaac Cohen UTRC,jlato@potomacinstitute.org
-Laurent Michel University of Connecticut,tom.breen@uconn.edu
+Michael Caramanis Boston University,mcaraman@bu.edu
+Peter Corke Queensland University of Technology,peter.corke@qut.edu.au
+Miriam Leeser Northeastern University,mel@ece.northeastern.edu
+Jan Madsen Technical University of Denmark,jama@dtu.dk
+Mohammad Al Faruque University of California Irvine,alfaruqu@uci.edu
+George Bollas University of Connecticut,george.bollas@uconn.edu
+Veronique Delebarre SafeRiver,veronique.delebarre@safe-river.com
+Marco Di Natale Scuola Superiore Sant'Anna,marco.dinataleg@sssup.itAbstract
+Andreas Naderlinger University of Salzburg,andreas.naderlinger@cs.uni-salzburg.at
+Dario Pompili Rutgers University,pompili@rutgers.edu
+David Wilson Auckland University of Technology,david.wilson@aut.ac.nz
+Russ Tedrake Massachusetts Institute of Technology,russt@csail.mit.edu
 Sayan Mitra University of Illinois at Urbana-Champaign,mitras@illinois.edu
+Ramesh Sethu General Motors,partnering@we-conect.com
+Ratnesh Kumar Iowa State University,rkumar@iastate.edu
+Sanjoy Baruah University of North Carolina at Chapel Hill,baruah@wustl.edu
+Ahmed Jerraya CEA Tech,ahmed.jerraya@cea.fr
+Usman Khan Tufts University,usman.khan@tufts.edu
+Christos Cassandras Boston University,cgc@bu.edu
+Oded Maler CNRS-VERIMAG University of Grenoble,CNRS-VERIMAGUniversityofGrenobleOded.Maler@imag.fr
+Laurent Michel University of Connecticut,laurent.michel@uconn.edu
+Miroslav Pajic University of Pennsylvania,miroslav.pajic@duke.edu
+Wolfgang Pree University of Salzburg,Wolfgang.Pree@cs.uni
+Ozer Unluhisarcikli ASML,ozer.unluhisarcikli@asml.com
+Sergey Yurgenson Harvard Medical School,sergey_yurgenson@hms.harvard.edu
 Magnus Egerstedt Georgia Institute of Technology,magnus.egerstedt@ece.gatech.edu
-Pau-Lo Hsu National Chiao-Tung University,ssyeh@ntut.edu.tw
+Pau-Lo Hsu National Chiao-Tung University,plhsu@mail.nctu.edu.tw
+Alexandru Mereacre University of Oxford,Alexandru.Mereacreg@cs.ox.ac.ukDepartmentofComputerScience
+Mark Spong The University of Texas at Dallas,mspong@utdallas.edu
+Reza Emami University of Toronto,reza.emami@utoronto.ca
+Zhihao Jiang University of Pennsylvania,zhihaoj@seas.upenn.edu
+Frank Slomka Ulm University,frank.slomka@uni-ulm.de
+Charles Taylor University of Louisiana at Lafayette,ctaylor@louisiana.edu
