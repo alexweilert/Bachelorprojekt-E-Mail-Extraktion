@@ -33,12 +33,6 @@ func ExtractEmailWithColly(url string, name string) (string, int, error) {
 	c.OnRequest(func(r *colly.Request) {
 		ua := userAgents[rand.Intn(len(userAgents))]
 		r.Headers.Set("User-Agent", ua)
-		fmt.Println("[COLLY] Verwende User-Agent:", ua)
-	})
-
-	c.OnResponse(func(r *colly.Response) {
-		fmt.Println("[DEBUG] Antwort erhalten von", r.Request.URL)
-		fmt.Println("[DEBUG] Gesendeter User-Agent:", r.Request.Headers.Get("User-Agent"))
 	})
 
 	emailPattern := regexp.MustCompile(`(?i)\b[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}\b`)
@@ -77,9 +71,24 @@ func ExtractEmailWithColly(url string, name string) (string, int, error) {
 		}
 	}
 
-	// Body scan
 	c.OnHTML("body", func(e *colly.HTMLElement) {
+		// 1. Normale E-Mail-Erkennung im Text
 		for _, match := range emailPattern.FindAllString(e.Text, -1) {
+			checkAndAddEmail(match)
+		}
+
+		// 2. E-Mail-Fragmente zusammensetzen (z. B. Wolfgang.PREE<span>@sbg.ac.at</span>)
+		rawHTML, _ := e.DOM.Html()
+		fragmentedEmailPattern := regexp.MustCompile(`([a-zA-Z0-9._%+\-]+)<span[^>]*?>.*?</span>@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}`)
+		for _, match := range fragmentedEmailPattern.FindAllString(rawHTML, -1) {
+			clean := stripHTMLTags(match)
+			clean = strings.ReplaceAll(clean, "\n", "")
+			checkAndAddEmail(clean)
+		}
+
+		// 3. MS Word / MsoNormal Varianten direkt im HTML
+		altEmailPattern := regexp.MustCompile(`(?i)([a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,})`)
+		for _, match := range altEmailPattern.FindAllString(rawHTML, -1) {
 			checkAndAddEmail(match)
 		}
 	})
@@ -152,4 +161,9 @@ func truncateEmailAfterTLD(email string) string {
 		return email[:loc[1]]
 	}
 	return email
+}
+
+func stripHTMLTags(input string) string {
+	re := regexp.MustCompile(`<[^>]*>`)
+	return re.ReplaceAllString(input, "")
 }
