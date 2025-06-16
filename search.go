@@ -13,7 +13,7 @@ import (
 func DuckDuckGoSearch(query string) ([]string, error) {
 	searchURL := "https://html.duckduckgo.com/html/?q=" + url.QueryEscape(query)
 
-	time.Sleep(8 * time.Second)
+	time.Sleep(5 * time.Second)
 
 	client := &http.Client{}
 
@@ -68,7 +68,7 @@ func extractRealDuckDuckGoURL(href string) (string, error) {
 func DuckDuckGoPDFSearch(query string) ([]string, error) {
 	// Suche nach PDF-Dateien mit filetype-Filter
 	searchURL := "https://html.duckduckgo.com/html/?q=" + url.QueryEscape(query)
-	time.Sleep(8 * time.Second)
+	time.Sleep(5 * time.Second)
 
 	client := &http.Client{}
 

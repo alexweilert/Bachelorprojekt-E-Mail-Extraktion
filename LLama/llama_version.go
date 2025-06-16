@@ -14,6 +14,13 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
+	"github.com/agnivade/levenshtein"
+)
+
+const (
+	inputFile  = "list_of_names_and_affiliations.csv"
+	outputFile = "results_llama.csv"
+	llamaModel = "llama3.3" // oder "llama4:scout", wie in Ollama vorhanden
 )
 
 type PersonEntry struct {
@@ -21,10 +28,7 @@ type PersonEntry struct {
 }
 
 func main() {
-	inputFile := "list_of_names_and_affiliations.csv"
-	outputFile := "results_llama.csv"
-
-	entries, err := ReadLamaCSV(inputFile)
+	entries, err := ReadCSV(inputFile)
 	if err != nil {
 		panic(err)
 	}
@@ -33,7 +37,8 @@ func main() {
 
 	for i, entry := range entries {
 		fmt.Printf("\n➡️ [%d/%d] %s\n", i+1, len(entries), entry.NameAndInstitution)
-		links, err := DuckDuckGoLlamaSearch(entry.NameAndInstitution)
+
+		links, err := DuckDuckGoSearch(entry.NameAndInstitution)
 		if err != nil || len(links) == 0 {
 			fmt.Println("⚠️ DuckDuckGo fehlgeschlagen.")
 			continue
@@ -46,24 +51,36 @@ func main() {
 				continue
 			}
 
+			emails := extractEmails(text)
+			bestEmail := findClosestEmail(entry.NameAndInstitution, emails)
+			if bestEmail != "" {
+				results[entry.NameAndInstitution] = bestEmail
+				fmt.Printf("✅ Gefunden: %s\n", bestEmail)
+				break
+			}
+
 			prompt := BuildLlamaPrompt(entry.NameAndInstitution, text)
 			email, err := QueryLlamaREST(prompt)
 			if err == nil && isValidEmail(email) {
 				results[entry.NameAndInstitution] = email
-				fmt.Printf("✅ Gefunden: %s\n", email)
+				fmt.Printf("✅ LLaMA Gefunden: %s\n", email)
 				break
 			}
 		}
+
+		if i%5 == 0 {
+			fmt.Printf("🔄 Fortschritt: %d von %d verarbeitet\n", i+1, len(entries))
+		}
 	}
 
-	err = WriteLlamaCSV(outputFile, results)
+	err = WriteCSV(outputFile, results)
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println("\n✅ Ergebnisse gespeichert in:", outputFile)
 }
 
-func ReadLamaCSV(path string) ([]PersonEntry, error) {
+func ReadCSV(path string) ([]PersonEntry, error) {
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, err
@@ -87,7 +104,7 @@ func ReadLamaCSV(path string) ([]PersonEntry, error) {
 	return entries, nil
 }
 
-func WriteLlamaCSV(path string, results map[string]string) error {
+func WriteCSV(path string, results map[string]string) error {
 	f, err := os.Create(path)
 	if err != nil {
 		return err
@@ -103,8 +120,9 @@ func WriteLlamaCSV(path string, results map[string]string) error {
 	return nil
 }
 
-func DownloadPageText(url string) (string, error) {
-	resp, err := http.Get(url)
+func DownloadPageText(pageURL string) (string, error) {
+	client := &http.Client{Timeout: 15 * time.Second}
+	resp, err := client.Get(pageURL)
 	if err != nil {
 		return "", err
 	}
@@ -116,16 +134,11 @@ func DownloadPageText(url string) (string, error) {
 	}
 
 	var builder strings.Builder
-
-	// Text aus sichtbarem DOM
 	builder.WriteString(strings.TrimSpace(doc.Text()))
 
-	// Text aus spezifischen E-Mail-ähnlichen Klassen extrahieren
 	doc.Find(".email, .email-ta, .SpellE").Each(func(i int, s *goquery.Selection) {
 		builder.WriteString("\n" + strings.TrimSpace(s.Text()))
 	})
-
-	// Text aus <span>, <p>, <td> mit Email-Keywords
 	doc.Find("span, p, td, div").Each(func(i int, s *goquery.Selection) {
 		text := s.Text()
 		if strings.Contains(strings.ToLower(text), "email") || strings.Contains(text, "@") {
@@ -136,6 +149,26 @@ func DownloadPageText(url string) (string, error) {
 	return builder.String(), nil
 }
 
+func extractEmails(text string) []string {
+	re := regexp.MustCompile(`(?i)\b[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}\b`)
+	return re.FindAllString(text, -1)
+}
+
+func findClosestEmail(name string, emails []string) string {
+	bestEmail := ""
+	lowestDistance := 1000
+	name = strings.ToLower(name)
+
+	for _, email := range emails {
+		distance := levenshtein.ComputeDistance(name, strings.ToLower(email))
+		if distance < lowestDistance {
+			lowestDistance = distance
+			bestEmail = email
+		}
+	}
+	return bestEmail
+}
+
 func BuildLlamaPrompt(name string, text string) string {
 	return fmt.Sprintf(
 		"Extrahiere eine E-Mail-Adresse aus folgendem Text, die möglichst gut zu \"%s\" passt:\n\n%s\n\nAntwort nur mit der E-Mail.",
@@ -144,7 +177,7 @@ func BuildLlamaPrompt(name string, text string) string {
 
 func QueryLlamaREST(prompt string) (string, error) {
 	payload := map[string]interface{}{
-		"model":  "llama4:scout", // Name exakt wie in Ollama
+		"model":  llamaModel,
 		"prompt": prompt,
 		"stream": false,
 	}
@@ -157,7 +190,7 @@ func QueryLlamaREST(prompt string) (string, error) {
 	}
 	req.Header.Set("Content-Type", "application/json")
 
-	client := &http.Client{}
+	client := &http.Client{Timeout: 20 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
 		return "", err
@@ -169,6 +202,7 @@ func QueryLlamaREST(prompt string) (string, error) {
 	}
 	err = json.NewDecoder(resp.Body).Decode(&result)
 	if err != nil {
+		fmt.Println("❌ Llama JSON-Fehler:", err)
 		return "", err
 	}
 
@@ -176,23 +210,25 @@ func QueryLlamaREST(prompt string) (string, error) {
 }
 
 func isValidEmail(email string) bool {
+	email = strings.TrimSpace(email)
+	if strings.Count(email, "@") != 1 || len(email) > 100 {
+		return false
+	}
 	re := regexp.MustCompile(`(?i)\b[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}\b`)
 	return re.MatchString(email)
 }
 
-func DuckDuckGoLlamaSearch(query string) ([]string, error) {
-	time.Sleep(8 * time.Second)
+func DuckDuckGoSearch(query string) ([]string, error) {
+	time.Sleep(3 * time.Second)
 
 	searchURL := "https://html.duckduckgo.com/html/?q=" + url.QueryEscape(query)
-	client := &http.Client{}
-
 	req, err := http.NewRequest("GET", searchURL, nil)
 	if err != nil {
 		return nil, err
 	}
-
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
 
+	client := &http.Client{Timeout: 15 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
@@ -208,28 +244,16 @@ func DuckDuckGoLlamaSearch(query string) ([]string, error) {
 	doc.Find(".result__a").Each(func(i int, s *goquery.Selection) {
 		href, exists := s.Attr("href")
 		if exists {
-			decoded, err := extractRealDuckDuckGoLlamaURL(href)
+			u, err := url.Parse(href)
 			if err == nil {
-				urls = append(urls, decoded)
+				uddg := u.Query().Get("uddg")
+				decoded, err := url.QueryUnescape(uddg)
+				if err == nil && strings.HasPrefix(decoded, "http") {
+					urls = append(urls, decoded)
+				}
 			}
 		}
 	})
 
 	return urls, nil
-}
-
-// Extrahiert aus DuckDuckGo-Umleitungs-URL die echte Ziel-URL
-func extractRealDuckDuckGoLlamaURL(href string) (string, error) {
-	u, err := url.Parse(href)
-	if err != nil {
-		return "", err
-	}
-
-	q := u.Query()
-	realURL := q.Get("uddg")
-	realURL, err = url.QueryUnescape(realURL)
-	if err != nil {
-		return "", err
-	}
-	return realURL, nil
 }

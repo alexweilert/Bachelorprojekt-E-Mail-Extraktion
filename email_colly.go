@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/gocolly/colly"
-	"math/rand"
 	"net/mail"
 	"regexp"
 	"strings"
@@ -12,27 +11,13 @@ import (
 
 func ExtractEmailWithColly(url string, name string) (string, int, error) {
 	c := colly.NewCollector(
-		colly.UserAgent(""),
+		colly.UserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"),
 	)
 
 	c.Limit(&colly.LimitRule{
-		DomainGlob:  "*",             // Gilt für alle Domains
-		Delay:       2 * time.Second, // Fester Delay von 2 Sekunden
-		RandomDelay: 1 * time.Second, // Zufälliger Zusatzdelay von bis zu 1 Sekunde
-	})
-
-	userAgents := []string{
-		"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-		"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15",
-		"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
-		"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:115.0) Gecko/20100101 Firefox/115.0",
-		"Mozilla/5.0 (iPhone; CPU iPhone OS 16_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.2 Mobile/15E148 Safari/604.1",
-	}
-	rand.Seed(time.Now().UnixNano())
-
-	c.OnRequest(func(r *colly.Request) {
-		ua := userAgents[rand.Intn(len(userAgents))]
-		r.Headers.Set("User-Agent", ua)
+		DomainGlob:  "*",
+		Delay:       2 * time.Second,
+		RandomDelay: 1 * time.Second,
 	})
 
 	emailPattern := regexp.MustCompile(`(?i)\b[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}\b`)

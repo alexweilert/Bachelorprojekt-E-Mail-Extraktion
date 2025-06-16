@@ -45,7 +45,7 @@ func main() {
 			}
 		}
 		// 2️⃣ chromedp nur wenn nötig
-		if bestEmail == "" || (bestScore <= 4 && sameEmailStreak <= 1) {
+		if bestEmail == "" || (bestScore < 7 && sameEmailStreak <= 1) {
 			for _, link := range links {
 				email, score, err := ExtractEmailFromURL(link, contactQuery)
 				if err != nil || email == "" {
@@ -59,7 +59,7 @@ func main() {
 		}
 
 		// 3️⃣ Fallback-Suche mit Query
-		if bestEmail == "" || (bestScore <= 4 && sameEmailStreak <= 1) {
+		if bestEmail == "" || (bestScore < 7 && sameEmailStreak <= 1) {
 			fallbackQuery := entry + " email address"
 
 			fallbackLinks, err := DuckDuckGoSearch(fallbackQuery)
@@ -76,7 +76,7 @@ func main() {
 							break
 						}
 					}
-					if bestEmail == "" || (bestScore <= 4 && sameEmailStreak <= 1) {
+					if bestEmail == "" || (bestScore < 7 && sameEmailStreak <= 1) {
 						fmt.Println("Untersuche Fallback-Link Colly:", link)
 						// Colly
 						email, score, err := ExtractEmailWithColly(link, entry)
@@ -91,7 +91,7 @@ func main() {
 		}
 
 		// 4️⃣ PDF-Suche als letzte Option
-		if bestEmail == "" || (bestScore <= 4 && sameEmailStreak <= 1) {
+		if bestEmail == "" || (bestScore < 7 && sameEmailStreak <= 1) {
 			//	fmt.Println("📄 Letzter Versuch PDF-basierte Suche")
 			pdfQuery := entry + " filetype:pdf"
 			pdfLinks, err := DuckDuckGoPDFSearch(pdfQuery)
@@ -112,8 +112,9 @@ func main() {
 		}
 
 		// Ergebnis-Ausgabe
-		if bestEmail == "" || (bestScore <= 4 && sameEmailStreak <= 1) {
-			fmt.Printf("❌ Keine passende E-Mail gefunden für: %s\n", entry)
+		if bestEmail == "" || (bestScore < 7 && sameEmailStreak <= 1) {
+			fmt.Printf("❌ Keine passende E-Mail gefunden für: %s\n", entry, bestEmail, bestScore)
+			results[entry] = bestEmail
 		} else {
 			results[entry] = bestEmail
 			fmt.Printf("✅ Found: %s => %s (Score: %d)\n", entry, bestEmail, bestScore)
