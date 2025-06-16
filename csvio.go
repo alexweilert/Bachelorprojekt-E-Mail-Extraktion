@@ -52,8 +52,6 @@ func WriteCSV(outputFile string, results map[string]string) error {
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 
-	writer.Write([]string{"Name + Institution", "Email"})
-
 	for k, v := range results {
 		writer.Write([]string{k, v})
 	}

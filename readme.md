@@ -12,7 +12,6 @@ Output: ein CSV-File mit einer Spalte Namen + Institution und einer Spalte E-Mai
 
 (3) Verarbeitung mit AI Agents, die eine UI-Oberfläche bedienen können (siehe Text Training for Computer Use anbei)
 
-
 Vergleich der Qualität der Ergebnisse
 Vergleich der Implementierungen: # Lines of Code, was konnte generiert werden, was nicht; Code-Komplexität
 Vergleich der Kosten für die LLM-Verwendung bei (2) und (3)

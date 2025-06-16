@@ -68,7 +68,6 @@ func ExtractEmailFromURL(url string, name string) (string, int, error) {
 		}
 
 		score := getScore(mailLower, firstName, middleName, lastName)
-		fmt.Printf("[GEFUNDEN] %s → Score: %d\n", mail, score)
 
 		if score > highestScore {
 			highestScore = score
@@ -90,7 +89,6 @@ func ExtractEmailFromURL(url string, name string) (string, int, error) {
 			}
 		}
 		if bestEmail == "" {
-			fmt.Println("[KEIN TREFFER] Keine passende E-Mail gefunden.")
 			return "", 0, fmt.Errorf("keine gültige Adresse extrahiert")
 		}
 	}

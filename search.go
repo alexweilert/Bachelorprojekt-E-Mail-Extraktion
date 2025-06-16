@@ -11,12 +11,11 @@ import (
 )
 
 func DuckDuckGoSearch(query string) ([]string, error) {
-	time.Sleep(5 * time.Second)
-
 	searchURL := "https://html.duckduckgo.com/html/?q=" + url.QueryEscape(query)
-	client := &http.Client{
-		Timeout: 10 * time.Second,
-	}
+
+	time.Sleep(8 * time.Second)
+
+	client := &http.Client{}
 
 	req, err := http.NewRequest("GET", searchURL, nil)
 	if err != nil {
@@ -63,20 +62,15 @@ func extractRealDuckDuckGoURL(href string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	// fmt.Println(" ➤ Extrahierter echter Link:", realURL)
 	return realURL, nil
 }
 
 func DuckDuckGoPDFSearch(query string) ([]string, error) {
-	time.Sleep(5 * time.Second)
-
 	// Suche nach PDF-Dateien mit filetype-Filter
-	fullQuery := query + " filetype:pdf"
-	searchURL := "https://html.duckduckgo.com/html/?q=" + url.QueryEscape(fullQuery)
+	searchURL := "https://html.duckduckgo.com/html/?q=" + url.QueryEscape(query)
+	time.Sleep(8 * time.Second)
 
-	client := &http.Client{
-		Timeout: 10 * time.Second,
-	}
+	client := &http.Client{}
 
 	req, err := http.NewRequest("GET", searchURL, nil)
 	if err != nil {
@@ -109,10 +103,6 @@ func DuckDuckGoPDFSearch(query string) ([]string, error) {
 
 	if len(urls) == 0 {
 		fmt.Println("⚠️ DuckDuckGo (PDF) hat keine PDFs geliefert.")
-	} else {
-		for _, link := range urls {
-			fmt.Println("📄 [DuckDuckGo PDF] Link:", link)
-		}
 	}
 
 	return urls, nil

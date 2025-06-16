@@ -7,9 +7,11 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -31,7 +33,7 @@ func main() {
 
 	for i, entry := range entries {
 		fmt.Printf("\n➡️ [%d/%d] %s\n", i+1, len(entries), entry.NameAndInstitution)
-		links, err := DuckDuckGoSearch(entry.NameAndInstitution)
+		links, err := DuckDuckGoLlamaSearch(entry.NameAndInstitution)
 		if err != nil || len(links) == 0 {
 			fmt.Println("⚠️ DuckDuckGo fehlgeschlagen.")
 			continue
@@ -141,7 +143,12 @@ func BuildLlamaPrompt(name string, text string) string {
 }
 
 func QueryLlamaREST(prompt string) (string, error) {
-	payload := map[string]string{"prompt": prompt}
+	payload := map[string]interface{}{
+		"model":  "llama4:scout", // Name exakt wie in Ollama
+		"prompt": prompt,
+		"stream": false,
+	}
+
 	body, _ := json.Marshal(payload)
 
 	req, err := http.NewRequest("POST", "http://localhost:11434/api/generate", bytes.NewBuffer(body))
@@ -171,4 +178,58 @@ func QueryLlamaREST(prompt string) (string, error) {
 func isValidEmail(email string) bool {
 	re := regexp.MustCompile(`(?i)\b[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}\b`)
 	return re.MatchString(email)
+}
+
+func DuckDuckGoLlamaSearch(query string) ([]string, error) {
+	time.Sleep(8 * time.Second)
+
+	searchURL := "https://html.duckduckgo.com/html/?q=" + url.QueryEscape(query)
+	client := &http.Client{}
+
+	req, err := http.NewRequest("GET", searchURL, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	doc, err := goquery.NewDocumentFromReader(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	var urls []string
+	doc.Find(".result__a").Each(func(i int, s *goquery.Selection) {
+		href, exists := s.Attr("href")
+		if exists {
+			decoded, err := extractRealDuckDuckGoLlamaURL(href)
+			if err == nil {
+				urls = append(urls, decoded)
+			}
+		}
+	})
+
+	return urls, nil
+}
+
+// Extrahiert aus DuckDuckGo-Umleitungs-URL die echte Ziel-URL
+func extractRealDuckDuckGoLlamaURL(href string) (string, error) {
+	u, err := url.Parse(href)
+	if err != nil {
+		return "", err
+	}
+
+	q := u.Query()
+	realURL := q.Get("uddg")
+	realURL, err = url.QueryUnescape(realURL)
+	if err != nil {
+		return "", err
+	}
+	return realURL, nil
 }

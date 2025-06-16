@@ -62,7 +62,6 @@ func ExtractEmailWithColly(url string, name string) (string, int, error) {
 		}
 
 		score := getScore(cleanLower, firstName, middleName, lastName)
-		fmt.Printf("[COLLY] %s → Score: %d\n", clean, score)
 
 		allEmails[clean] = true
 		if score > highestScore {
