@@ -20,7 +20,8 @@ import (
 const (
 	inputFile  = "list_of_names_and_affiliations.csv"
 	outputFile = "results_llama.csv"
-	llamaModel = "llama3.3" // oder "llama4:scout", wie in Ollama vorhanden
+	//llamaModel = "llama2:7b"
+	llamaModel = "llama3.3:latest"
 )
 
 type PersonEntry struct {
@@ -34,7 +35,7 @@ func main() {
 	}
 
 	results := make(map[string]string)
-
+	zeit := time.Now().Unix()
 	for i, entry := range entries {
 		fmt.Printf("\n➡️ [%d/%d] %s\n", i+1, len(entries), entry.NameAndInstitution)
 
@@ -51,14 +52,6 @@ func main() {
 				continue
 			}
 
-			emails := extractEmails(text)
-			bestEmail := findClosestEmail(entry.NameAndInstitution, emails)
-			if bestEmail != "" {
-				results[entry.NameAndInstitution] = bestEmail
-				fmt.Printf("✅ Gefunden: %s\n", bestEmail)
-				break
-			}
-
 			prompt := BuildLlamaPrompt(entry.NameAndInstitution, text)
 			email, err := QueryLlamaREST(prompt)
 			if err == nil && isValidEmail(email) {
@@ -72,6 +65,8 @@ func main() {
 			fmt.Printf("🔄 Fortschritt: %d von %d verarbeitet\n", i+1, len(entries))
 		}
 	}
+	zeit = time.Now().Unix() - zeit
+	fmt.Println(zeit)
 
 	err = WriteCSV(outputFile, results)
 	if err != nil {
@@ -186,27 +181,39 @@ func QueryLlamaREST(prompt string) (string, error) {
 
 	req, err := http.NewRequest("POST", "http://localhost:11434/api/generate", bytes.NewBuffer(body))
 	if err != nil {
-		return "Fehler im Llama", err
+		return "Fehler beim Erstellen der Anfrage an LLaMA", err
 	}
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{Timeout: 20 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
+		fmt.Println("❌ LLaMA ist nicht erreichbar.")
 		return "", err
 	}
 	defer resp.Body.Close()
 
-	var result struct {
-		Response string `json:"response"`
-	}
+	// Vollständige Antwort dekodieren
+	var result map[string]interface{}
 	err = json.NewDecoder(resp.Body).Decode(&result)
 	if err != nil {
-		fmt.Println("❌ Llama JSON-Fehler:", err)
+		fmt.Println("❌ LLaMA JSON-Fehler:", err)
 		return "", err
 	}
 
-	return strings.TrimSpace(result.Response), nil
+	// Fehler in der LLaMA-Antwort erkennen
+	if errMsg, ok := result["error"].(string); ok && errMsg != "" {
+		fmt.Println("❌ LLaMA Fehler:", errMsg)
+		return "", fmt.Errorf("llama error: %s", errMsg)
+	}
+
+	// Reguläre Antwort extrahieren
+	if response, ok := result["response"].(string); ok && strings.TrimSpace(response) != "" {
+		return strings.TrimSpace(response), nil
+	}
+
+	// Leere oder ungültige Antwort
+	return "", fmt.Errorf("keine gültige Antwort von LLaMA erhalten")
 }
 
 func isValidEmail(email string) bool {

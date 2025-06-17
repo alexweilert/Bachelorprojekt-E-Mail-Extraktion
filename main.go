@@ -34,20 +34,10 @@ func main() {
 		emailScores := make(map[string]int)
 
 		// 1️⃣ Colly zuerst
-		for _, link := range links {
-			email, score, err := ExtractEmailWithColly(link, contactQuery)
-			if err != nil || email == "" {
-				continue
-			}
-
-			if updateBestEmail(email, score, &lastEmail, &sameEmailStreak, &bestEmail, &bestScore, emailScores) || score >= 5 {
-				break
-			}
-		}
-		// 2️⃣ chromedp nur wenn nötig
-		if bestEmail == "" || (bestScore < 7 && sameEmailStreak <= 1) {
+		/*
 			for _, link := range links {
-				email, score, err := ExtractEmailFromURL(link, contactQuery)
+
+				email, score, err := ExtractEmailWithColly(link, contactQuery)
 				if err != nil || email == "" {
 					continue
 				}
@@ -56,7 +46,22 @@ func main() {
 					break
 				}
 			}
+				// 2️⃣ chromedp nur wenn nötig
+				if bestEmail == "" || (bestScore < 7 && sameEmailStreak <= 1) {
+
+
+		*/
+		for _, link := range links {
+			email, score, err := ExtractEmailFromURL(link, contactQuery)
+			if err != nil || email == "" {
+				continue
+			}
+
+			if updateBestEmail(email, score, &lastEmail, &sameEmailStreak, &bestEmail, &bestScore, emailScores) || score >= 5 {
+				break
+			}
 		}
+		//}
 
 		// 3️⃣ Fallback-Suche mit Query
 		if bestEmail == "" || (bestScore < 7 && sameEmailStreak <= 1) {
@@ -68,15 +73,7 @@ func main() {
 			}
 			if err == nil {
 				for _, link := range fallbackLinks {
-					//fmt.Println("Untersuche Fallback-Link ChromeDP:", link)
-					// chromedp
-					email, score, err := ExtractEmailFromURL(link, entry)
-					if err == nil && email != "" {
-						if updateBestEmail(email, score, &lastEmail, &sameEmailStreak, &bestEmail, &bestScore, emailScores) || score >= 5 {
-							break
-						}
-					}
-					if bestEmail == "" || (bestScore < 7 && sameEmailStreak <= 1) {
+					/*
 						fmt.Println("Untersuche Fallback-Link Colly:", link)
 						// Colly
 						email, score, err := ExtractEmailWithColly(link, entry)
@@ -85,22 +82,12 @@ func main() {
 								break
 							}
 						}
-					}
-				}
-			}
-		}
-
-		// 4️⃣ PDF-Suche als letzte Option
-		if bestEmail == "" || (bestScore < 7 && sameEmailStreak <= 1) {
-			//	fmt.Println("📄 Letzter Versuch PDF-basierte Suche")
-			pdfQuery := entry + " filetype:pdf"
-			pdfLinks, err := DuckDuckGoPDFSearch(pdfQuery)
-			if err == nil && len(pdfLinks) > 0 {
-				for _, pdfURL := range pdfLinks {
-					filename := "temp.pdf"
-					err := DownloadPDF(pdfURL, filename)
-					if err == nil {
-						email, score, err := ExtractEmailsFromPDF(filename, entry)
+					
+					*/
+					if bestEmail == "" || (bestScore < 7 && sameEmailStreak <= 1) {
+						fmt.Println("Untersuche Fallback-Link ChromeDP:", link)
+						// chromedp
+						email, score, err := ExtractEmailFromURL(link, entry)
 						if err == nil && email != "" {
 							if updateBestEmail(email, score, &lastEmail, &sameEmailStreak, &bestEmail, &bestScore, emailScores) || score >= 5 {
 								break
@@ -110,10 +97,32 @@ func main() {
 				}
 			}
 		}
+		/*
+			// 4️⃣ PDF-Suche als letzte Option
+			if bestEmail == "" || (bestScore < 7 && sameEmailStreak <= 1) {
+				//	fmt.Println("📄 Letzter Versuch PDF-basierte Suche")
+				pdfQuery := entry + " filetype:pdf"
+				pdfLinks, err := DuckDuckGoPDFSearch(pdfQuery)
+				if err == nil && len(pdfLinks) > 0 {
+					for _, pdfURL := range pdfLinks {
+						filename := "temp.pdf"
+						err := DownloadPDF(pdfURL, filename)
+						if err == nil {
+							email, score, err := ExtractEmailsFromPDF(filename, entry)
+							if err == nil && email != "" {
+								if updateBestEmail(email, score, &lastEmail, &sameEmailStreak, &bestEmail, &bestScore, emailScores) || score >= 5 {
+									break
+								}
+							}
+						}
+					}
+				}
+			}
 
+		*/
 		// Ergebnis-Ausgabe
 		if bestEmail == "" || (bestScore < 7 && sameEmailStreak <= 1) {
-			fmt.Printf("❌ Keine passende E-Mail gefunden für: %s\n", entry, bestEmail, bestScore)
+			fmt.Printf("❌ Keine passende E-Mail gefunden für: %s %s %d \n", entry, bestEmail, bestScore)
 			results[entry] = bestEmail
 		} else {
 			results[entry] = bestEmail
