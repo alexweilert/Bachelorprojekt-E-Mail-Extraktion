@@ -1,48 +1,44 @@
 package main
 
 import (
-	"bufio"
 	"encoding/csv"
-	"fmt"
-	"io"
 	"os"
 	"strings"
 )
 
-func ReadCSV(filepath string) ([]string, error) {
+func ReadCSV(filepath string) ([]PersonEntry, error) {
 	file, err := os.Open(filepath)
 	if err != nil {
 		return nil, err
 	}
 	defer file.Close()
 
-	reader := csv.NewReader(bufio.NewReader(file))
-	var lines []string
+	reader := csv.NewReader(file)
+	var entries []PersonEntry
 	lineIndex := 0
 
 	for {
 		line, err := reader.Read()
-		if err == io.EOF {
+		if err != nil {
 			break
 		}
-		if err != nil {
-			return nil, err
-		}
 		if len(line) > 0 {
-			// Bereinige BOM aus erster Zeile
-			text := strings.TrimSpace(line[0])
+			text := line[0]
 			if lineIndex == 0 {
-				text = strings.TrimPrefix(text, "\uFEFF")
+				text = strings.ReplaceAll(text, "\uFEFF", "")
 			}
-			lines = append(lines, text)
+			entries = append(entries, PersonEntry{NameAndInstitution: text})
 			lineIndex++
 		}
 	}
-	fmt.Printf("📥 %d Einträge aus CSV geladen\n", len(lines))
-	return lines, nil
+	return entries, nil
 }
 
-func WriteCSV(outputFile string, results map[string]string) error {
+type PersonEntry struct {
+	NameAndInstitution string
+}
+
+func WriteCSV(outputFile string, results []ResultRow) error {
 	file, err := os.Create(outputFile)
 	if err != nil {
 		return err
@@ -52,8 +48,9 @@ func WriteCSV(outputFile string, results map[string]string) error {
 	writer := csv.NewWriter(file)
 	defer writer.Flush()
 
-	for k, v := range results {
-		writer.Write([]string{k, v})
+	writer.Write([]string{"Name + Institution", "Email", "Zeit", "Gefunden auf"})
+	for _, row := range results {
+		writer.Write([]string{row.Name, row.Email, row.Time, row.Source})
 	}
 	return nil
 }

@@ -18,7 +18,7 @@ func getScore(email, firstName, middleName, lastName string) int {
 		}
 	}
 
-	// 2. Initialen + Kombinationen (wie gehabt)
+	// 2. Initialen + Kombinationen (3 Punkte)
 	initialCombos := generateInitialCombos(firstName, middleName, lastName)
 	for _, combo := range initialCombos {
 		if strings.Contains(email, combo) {
@@ -48,6 +48,17 @@ func getScore(email, firstName, middleName, lastName string) int {
 		case normalized < 0.6:
 			score += 1
 		}
+	}
+
+	// 5. Initialen im lokalen Teil (2 Punkte)
+	if strings.Contains(email, string(lastName[0])) && strings.Contains(email, string(firstName[0])) && strings.Contains(email, string(middleName[0])) {
+		score += 3
+	} else if strings.Contains(email, string(firstName[0])) && strings.Contains(email, string(lastName[0])) ||
+		strings.Contains(email, string(firstName[0])) && strings.Contains(email, string(middleName[0])) ||
+		strings.Contains(email, string(lastName[0])) && strings.Contains(email, string(middleName[0])) {
+		score += 2
+	} else if strings.Contains(email, string(lastName[0])) || strings.Contains(email, string(firstName[0])) || strings.Contains(email, string(middleName[0])) {
+		score += 1
 	}
 
 	return score

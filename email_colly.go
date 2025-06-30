@@ -10,6 +10,7 @@ import (
 )
 
 func ExtractEmailWithColly(url string, name string) (string, int, error) {
+	start := time.Now()
 	c := colly.NewCollector(
 		colly.UserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"),
 	)
@@ -26,11 +27,6 @@ func ExtractEmailWithColly(url string, name string) (string, int, error) {
 	highestScore := -1
 
 	firstName, middleName, lastName := extractNameParts(name)
-	blacklist := []string{
-		"info@", "contact@", "webmaster@", "noreply@", "support@",
-		"enquiries@", "communications@", "press@", "postmaster@",
-		"maintainer@", "marketing@", "speaking@", "partnering@",
-	}
 
 	checkAndAddEmail := func(email string) {
 		clean := sanitizeEmail(email)
@@ -38,13 +34,6 @@ func ExtractEmailWithColly(url string, name string) (string, int, error) {
 			return
 		}
 		cleanLower := strings.ToLower(clean)
-
-		// Blacklist-Check
-		for _, b := range blacklist {
-			if strings.Contains(cleanLower, b) {
-				return
-			}
-		}
 
 		score := getScore(cleanLower, firstName, middleName, lastName)
 
@@ -103,6 +92,9 @@ func ExtractEmailWithColly(url string, name string) (string, int, error) {
 			break
 		}
 	}
+
+	duration := time.Since(start)
+	fmt.Printf("⏱️ [Colly] %s: %.2fs\n", name, duration.Seconds())
 
 	if bestEmail == "" {
 		return "", 0, fmt.Errorf("keine E-Mail extrahiert")

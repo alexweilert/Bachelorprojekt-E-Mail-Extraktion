@@ -10,6 +10,8 @@ import (
 
 // ExtractEmailFromURL neue Hauptfunktion: gibt E-Mail **und Score** zurück
 func ExtractEmailFromURL(url string, name string) (string, int, error) {
+	start := time.Now()
+
 	ctx, cancel := chromedp.NewContext(context.Background())
 	defer cancel()
 
@@ -39,11 +41,6 @@ func ExtractEmailFromURL(url string, name string) (string, int, error) {
 	}
 
 	firstName, middleName, lastName := extractNameParts(name)
-	blacklist := []string{
-		"info@", "contact@", "webmaster@", "noreply@", "support@",
-		"enquiries@", "communications@", "press@", "postmaster@",
-		"maintainer@", "marketing@", "speaking@", "partnering@",
-	}
 
 	highestScore := -1
 	var bestEmail string
@@ -53,17 +50,6 @@ func ExtractEmailFromURL(url string, name string) (string, int, error) {
 		mailLower := strings.ToLower(mail)
 
 		if mail == "" || strings.Contains(mail, " ") {
-			continue
-		}
-
-		skip := false
-		for _, b := range blacklist {
-			if strings.Contains(mailLower, b) {
-				skip = true
-				break
-			}
-		}
-		if skip {
 			continue
 		}
 
@@ -92,6 +78,8 @@ func ExtractEmailFromURL(url string, name string) (string, int, error) {
 			return "", 0, fmt.Errorf("keine gültige Adresse extrahiert")
 		}
 	}
+	duration := time.Since(start)
+	fmt.Printf("⏱️ [Colly] %s: %.2fs\n", name, duration.Seconds())
 
 	return bestEmail, highestScore, nil
 }

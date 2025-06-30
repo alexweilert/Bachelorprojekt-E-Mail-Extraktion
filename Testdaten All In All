@@ -1,0 +1,565 @@
+GOROOT=C:\Program Files\Go #gosetup
+GOPATH=C:\Users\Weilert\go #gosetup
+"C:\Program Files\Go\bin\go.exe" build -o C:\Users\Weilert\AppData\Local\JetBrains\GoLand2025.1\tmp\GoLand\___2go_build_Bachelorprojekt.exe Bachelorprojekt #gosetup
+C:\Users\Weilert\AppData\Local\JetBrains\GoLand2025.1\tmp\GoLand\___2go_build_Bachelorprojekt.exe #gosetup
+🔢 Anzahl geladener Zeilen: 67
+1751272349
+
+➡️ [1/67] Suche nach: Mohammad Al Faruque University of California Irvine contact
+⏱️ [Colly] Mohammad Al Faruque University of California Irvine contact: 4.64s
+✅ Found: Mohammad Al Faruque University of California Irvine => alfaruqu@uci.edu (Score: 7)
+
+➡️ [2/67] Suche nach: Frank Allgöwer University of Stuttgart contact
+⏱️ [Colly] Frank Allgöwer University of Stuttgart contact: 4.67s
+⏱️ [Colly] Frank Allgöwer University of Stuttgart contact: 3.10s
+⏱️ [Colly] Frank Allgöwer University of Stuttgart contact: 2.91s
+⏱️ [Colly] Frank Allgöwer University of Stuttgart contact: 2.48s
+⏱️ [Colly] Frank Allgöwer University of Stuttgart contact: 2.45s
+⏱️ [Colly] Frank Allgöwer University of Stuttgart contact: 3.36s
+⏱️ [Colly] Frank Allgöwer University of Stuttgart contact: 4.30s
+⏱️ [Colly] Frank Allgöwer University of Stuttgart contact: 2.85s
+⏱️ [Colly] Frank Allgöwer University of Stuttgart contact: 2.50s
+⏱️ [Colly] Frank Allgöwer University of Stuttgart contact: 1.19s
+✅ Found: Frank Allgöwer University of Stuttgart => frank.allgower@ist.uni-stuttgart.de (Score: 14)
+
+➡️ [3/67] Suche nach: John Baillieul Boston University contact
+⏱️ [Colly] John Baillieul Boston University contact: 3.21s
+✅ Found: John Baillieul Boston University => johnb@bu.edu (Score: 10)
+
+➡️ [4/67] Suche nach: Sanjoy Baruah University of North Carolina at Chapel Hill contact
+⏱️ [Colly] Sanjoy Baruah University of North Carolina at Chapel Hill contact: 5.36s
+✅ Found: Sanjoy Baruah University of North Carolina at Chapel Hill => baruah@wustl.edu (Score: 10)
+
+➡️ [5/67] Suche nach: George Bollas University of Connecticut contact
+⏱️ [Colly] George Bollas University of Connecticut contact: 3.57s
+✅ Found: George Bollas University of Connecticut => george.bollas@uconn.edu (Score: 18)
+
+➡️ [6/67] Suche nach: Michael Caramanis Boston University contact
+⏱️ [Colly] Michael Caramanis Boston University contact: 2.11s
+⏱️ [Colly] Michael Caramanis Boston University contact: 2.00s
+✅ Found: Michael Caramanis Boston University => mcaraman@bu.edu (Score: 6)
+
+➡️ [7/67] Suche nach: Christos Cassandras Boston University contact
+⏱️ [Colly] Christos Cassandras Boston University contact: 2.93s
+⏱️ [Colly] Christos Cassandras Boston University contact: 6.38s
+⏱️ [Colly] Christos Cassandras Boston University contact: 2.46s
+⏱️ [Colly] Christos Cassandras Boston University contact: 2.76s
+⏱️ [Colly] Christos Cassandras Boston University contact: 2.99s
+[Abbruch] cgc@bu.edu dreimal hintereinander gefunden → übernommen.
+✅ Found: Christos Cassandras Boston University => cgc@bu.edu (Score: 3)
+
+➡️ [8/67] Suche nach: Isaac Cohen UTRC contact
+⏱️ [Colly] Isaac Cohen UTRC contact: 2.78s
+✅ Found: Isaac Cohen UTRC => isaac.cohen@utrc.utc.com (Score: 24)
+
+➡️ [9/67] Suche nach: Peter Corke Queensland University of Technology contact
+⏱️ [Colly] Peter Corke Queensland University of Technology contact: 6.20s
+✅ Found: Peter Corke Queensland University of Technology => peter.corke@qut.edu.au (Score: 18)
+
+➡️ [10/67] Suche nach: Krzysztof Czarnecki University of Waterloo contact
+⏱️ [Colly] Krzysztof Czarnecki University of Waterloo contact: 5.06s
+⏱️ [Colly] Krzysztof Czarnecki University of Waterloo contact: 4.16s
+✅ Found: Krzysztof Czarnecki University of Waterloo => krzysztof.czarnecki@uwaterloo.ca (Score: 20)
+
+➡️ [11/67] Suche nach: Luca De Nardis University of Rome La Sapienza contact
+⏱️ [Colly] Luca De Nardis University of Rome La Sapienza contact: 3.52s
+✅ Found: Luca De Nardis University of Rome La Sapienza => luca.denardis@uniroma1.it (Score: 21)
+
+➡️ [12/67] Suche nach: Veronique Delebarre SafeRiver contact
+⏱️ [Colly] Veronique Delebarre SafeRiver contact: 4.44s
+⏱️ [Colly] Veronique Delebarre SafeRiver contact: 2.90s
+⏱️ [Colly] Veronique Delebarre SafeRiver contact: 2.21s
+⏱️ [Colly] Veronique Delebarre SafeRiver: 3.53s
+⏱️ [PDF] Veronique Delebarre SafeRiver: 0.03s
+⏱️ [PDF] Veronique Delebarre SafeRiver: 0.01s
+⏱️ [PDF] Veronique Delebarre SafeRiver: 0.00s
+⏱️ [PDF] Veronique Delebarre SafeRiver: 0.02s
+✅ Found: Veronique Delebarre SafeRiver => veronique.delebarre@safe-river.com (Score: 20)
+
+➡️ [13/67] Suche nach: Marco Di Natale Scuola Superiore Sant'Anna contact
+⏱️ [Colly] Marco Di Natale Scuola Superiore Sant'Anna contact: 2.33s
+✅ Found: Marco Di Natale Scuola Superiore Sant'Anna => marco@sssup.it (Score: 9)
+
+➡️ [14/67] Suche nach: Magnus Egerstedt Georgia Institute of Technology contact
+⏱️ [Colly] Magnus Egerstedt Georgia Institute of Technology contact: 2.80s
+✅ Found: Magnus Egerstedt Georgia Institute of Technology => magnus.egerstedt@ece.gatech.edu (Score: 20)
+
+➡️ [15/67] Suche nach: Reza Emami University of Toronto contact
+⏱️ [Colly] Reza Emami University of Toronto contact: 4.52s
+⏱️ [Colly] Reza Emami University of Toronto contact: 2.51s
+⏱️ [Colly] Reza Emami University of Toronto contact: 3.18s
+⏱️ [Colly] Reza Emami University of Toronto contact: 2.66s
+⏱️ [Colly] Reza Emami University of Toronto contact: 2.81s
+⏱️ [Colly] Reza Emami University of Toronto contact: 3.42s
+⏱️ [Colly] Reza Emami University of Toronto contact: 3.47s
+⏱️ [Colly] Reza Emami University of Toronto contact: 3.18s
+⏱️ [Colly] Reza Emami University of Toronto contact: 2.88s
+⏱️ [Colly] Reza Emami University of Toronto contact: 2.40s
+✅ Found: Reza Emami University of Toronto => reza.emami@utoronto.ca (Score: 18)
+
+➡️ [16/67] Suche nach: Zoran Filipi Clemson University contact
+⏱️ [Colly] Zoran Filipi Clemson University contact: 2.79s
+✅ Found: Zoran Filipi Clemson University => Emerituszfilipi@clemson.edu (Score: 18)
+
+➡️ [17/67] Suche nach: Soha Hassoun Tufts University contact
+⏱️ [Colly] Soha Hassoun Tufts University contact: 3.60s
+✅ Found: Soha Hassoun Tufts University => soha.hassoun@tufts.edu (Score: 24)
+
+➡️ [18/67] Suche nach: Florian Holzapfel Technical University of Munich contact
+⏱️ [Colly] Florian Holzapfel Technical University of Munich contact: 2.32s
+⏱️ [Colly] Florian Holzapfel Technical University of Munich contact: 5.66s
+✅ Found: Florian Holzapfel Technical University of Munich => florian.holzapfel@tum.de (Score: 20)
+
+➡️ [19/67] Suche nach: Pau-Lo Hsu National Chiao-Tung University contact
+⏱️ [Colly] Pau-Lo Hsu National Chiao-Tung University contact: 4.19s
+⏱️ [Colly] Pau-Lo Hsu National Chiao-Tung University contact: 4.50s
+✅ Found: Pau-Lo Hsu National Chiao-Tung University => plhsu@mail.nctu.edu (Score: 7)
+
+➡️ [20/67] Suche nach: Ahmed Jerraya CEA Tech contact
+⏱️ [Colly] Ahmed Jerraya CEA Tech contact: 3.51s
+⏱️ [Colly] Ahmed Jerraya CEA Tech contact: 2.79s
+✅ Found: Ahmed Jerraya CEA Tech => ahmed.jerraya@cea.fr (Score: 26)
+
+➡️ [21/67] Suche nach: Zhihao Jiang University of Pennsylvania contact
+⏱️ [Colly] Zhihao Jiang University of Pennsylvania contact: 4.57s
+⏱️ [Colly] Zhihao Jiang University of Pennsylvania contact: 2.80s
+✅ Found: Zhihao Jiang University of Pennsylvania => zhihaoj@seas.upenn.edu (Score: 10)
+
+➡️ [22/67] Suche nach: Wisam Kadhim ASML contact
+⏱️ [Colly] Wisam Kadhim ASML contact: 3.41s
+⏱️ [Colly] Wisam Kadhim ASML contact: 2.79s
+⏱️ [Colly] Wisam Kadhim ASML: 3.48s
+⏱️ [Colly] Wisam Kadhim ASML: 3.72s
+⏱️ [Colly] Wisam Kadhim ASML: 2.37s
+⏱️ [Colly] Wisam Kadhim ASML: 2.58s
+⏱️ [Colly] Wisam Kadhim ASML: 3.21s
+⏱️ [PDF] Wisam Kadhim ASML: 0.02s
+⏱️ [PDF] Wisam Kadhim ASML: 0.00s
+⏱️ [PDF] Wisam Kadhim ASML: 0.03s
+✅ Found: Wisam Kadhim ASML => wisamuot@yahoo.com (Score: 9)
+
+➡️ [23/67] Suche nach: Usman Khan Tufts University contact
+⏱️ [Colly] Usman Khan Tufts University contact: 3.22s
+⏱️ [Colly] Usman Khan Tufts University contact: 3.48s
+✅ Found: Usman Khan Tufts University => usman.khan@tufts.edu (Score: 24)
+
+➡️ [24/67] Suche nach: Stephen Koffman Boeing Satellite Systems contact
+⏱️ [Colly] Stephen Koffman Boeing Satellite Systems contact: 2.91s
+⏱️ [Colly] Stephen Koffman Boeing Satellite Systems contact: 2.69s
+⏱️ [Colly] Stephen Koffman Boeing Satellite Systems contact: 2.64s
+⏱️ [Colly] Stephen Koffman Boeing Satellite Systems contact: 2.70s
+⏱️ [Colly] Stephen Koffman Boeing Satellite Systems contact: 2.38s
+✅ Found: Stephen Koffman Boeing Satellite Systems => bcssmarketing@boeing.com (Score: 7)
+
+➡️ [25/67] Suche nach: Ratnesh Kumar Iowa State University contact
+⏱️ [Colly] Ratnesh Kumar Iowa State University contact: 3.38s
+✅ Found: Ratnesh Kumar Iowa State University => rkumar@iastate.edu (Score: 14)
+
+➡️ [26/67] Suche nach: Mark Lawford McMaster University contact
+⏱️ [Colly] Mark Lawford McMaster University contact: 3.72s
+⏱️ [Colly] Mark Lawford McMaster University contact: 2.98s
+⏱️ [Colly] Mark Lawford McMaster University contact: 4.18s
+✅ Found: Mark Lawford McMaster University => lawford@mcmaster.ca (Score: 14)
+
+➡️ [27/67] Suche nach: Miriam Leeser Northeastern University contact
+⏱️ [Colly] Miriam Leeser Northeastern University contact: 3.94s
+✅ Found: Miriam Leeser Northeastern University => mel@ece.northeastern.edu (Score: 7)
+
+➡️ [28/67] Suche nach: Hugh T. Liu University of Toronto contact
+⏱️ [Colly] Hugh T. Liu University of Toronto contact: 2.13s
+⏱️ [Colly] Hugh T. Liu University of Toronto contact: 0.88s
+✅ Found: Hugh T. Liu University of Toronto => liu@utias.utoronto.ca (Score: 6)
+
+➡️ [29/67] Suche nach: Lennart Ljung Linköping University contact
+⏱️ [Colly] Lennart Ljung Linköping University contact: 2.81s
+✅ Found: Lennart Ljung Linköping University => lennart.ljung@liu.se (Score: 20)
+
+➡️ [30/67] Suche nach: Tim Lüth Technical University of Munich contact
+⏱️ [Colly] Tim Lüth Technical University of Munich contact: 3.11s
+⏱️ [Colly] Tim Lüth Technical University of Munich contact: 3.01s
+⏱️ [Colly] Tim Lüth Technical University of Munich contact: 2.47s
+⏱️ [Colly] Tim Lüth Technical University of Munich contact: 3.34s
+⏱️ [Colly] Tim Lüth Technical University of Munich contact: 3.64s
+⏱️ [Colly] Tim Lüth Technical University of Munich contact: 2.61s
+✅ Found: Tim Lüth Technical University of Munich => tim.lueth@tum.de (Score: 11)
+
+➡️ [31/67] Suche nach: Jan Madsen Technical University of Denmark contact
+⏱️ [Colly] Jan Madsen Technical University of Denmark contact: 3.01s
+⏱️ [Colly] Jan Madsen Technical University of Denmark contact: 3.14s
+⏱️ [Colly] Jan Madsen Technical University of Denmark contact: 3.48s
+⏱️ [Colly] Jan Madsen Technical University of Denmark contact: 2.56s
+⏱️ [Colly] Jan Madsen Technical University of Denmark contact: 2.98s
+⏱️ [Colly] Jan Madsen Technical University of Denmark contact: 4.31s
+✅ Found: Jan Madsen Technical University of Denmark => jan@imm.dtu.dk (Score: 10)
+
+➡️ [32/67] Suche nach: Neeraj Magotra Western New England University contact
+⏱️ [Colly] Neeraj Magotra Western New England University contact: 3.64s
+✅ Found: Neeraj Magotra Western New England University => neeraj.magotra@wne.edu (Score: 20)
+
+➡️ [33/67] Suche nach: Mary Ann Maher SoftMEMS LLC contact
+⏱️ [Colly] Mary Ann Maher SoftMEMS LLC contact: 2.96s
+✅ Found: Mary Ann Maher SoftMEMS LLC => maryann@softmems.com (Score: 17)
+
+➡️ [34/67] Suche nach: Oded Maler CNRS-VERIMAG University of Grenoble contact
+⏱️ [Colly] Oded Maler CNRS-VERIMAG University of Grenoble contact: 2.29s
+⏱️ [Colly] Oded Maler CNRS-VERIMAG University of Grenoble contact: 3.21s
+⏱️ [Colly] Oded Maler CNRS-VERIMAG University of Grenoble contact: 2.36s
+⏱️ [Colly] Oded Maler CNRS-VERIMAG University of Grenoble contact: 2.39s
+⏱️ [Colly] Oded Maler CNRS-VERIMAG University of Grenoble contact: 3.14s
+✅ Found: Oded Maler CNRS-VERIMAG University of Grenoble => Oded.Maler@imag.fr (Score: 17)
+
+➡️ [35/67] Suche nach: Pete Manolios Northeastern University contact
+⏱️ [Colly] Pete Manolios Northeastern University contact: 2.50s
+✅ Found: Pete Manolios Northeastern University => pete@ccs.neu.edu (Score: 9)
+
+➡️ [36/67] Suche nach: Alexandru Mereacre University of Oxford contact
+⏱️ [Colly] Alexandru Mereacre University of Oxford contact: 3.53s
+⏱️ [Colly] Alexandru Mereacre University of Oxford contact: 2.26s
+⏱️ [Colly] Alexandru Mereacre University of Oxford contact: 3.50s
+⏱️ [Colly] Alexandru Mereacre University of Oxford contact: 2.46s
+⏱️ [Colly] Alexandru Mereacre University of Oxford contact: 3.89s
+⏱️ [Colly] Alexandru Mereacre University of Oxford contact: 3.84s
+⏱️ [Colly] Alexandru Mereacre University of Oxford contact: 2.83s
+⏱️ [Colly] Alexandru Mereacre University of Oxford contact: 3.04s
+⏱️ [Colly] Alexandru Mereacre University of Oxford contact: 2.97s
+⏱️ [Colly] Alexandru Mereacre University of Oxford contact: 1.18s
+⏱️ [Colly] Alexandru Mereacre University of Oxford: 2.78s
+⏱️ [Colly] Alexandru Mereacre University of Oxford: 2.86s
+⏱️ [Colly] Alexandru Mereacre University of Oxford: 3.09s
+⏱️ [Colly] Alexandru Mereacre University of Oxford: 3.38s
+⏱️ [Colly] Alexandru Mereacre University of Oxford: 3.31s
+⏱️ [Colly] Alexandru Mereacre University of Oxford: 3.15s
+⏱️ [Colly] Alexandru Mereacre University of Oxford: 3.55s
+⏱️ [Colly] Alexandru Mereacre University of Oxford: 3.40s
+⏱️ [Colly] Alexandru Mereacre University of Oxford: 2.88s
+⏱️ [PDF] Alexandru Mereacre University of Oxford: 0.02s
+✅ Found: Alexandru Mereacre University of Oxford => esallothercomponentsthatan@rialeventhasoccurred.NoticethatthereisnoARsignalaswearenotusingtheadvancedalgorithmsgivenin (Score: 6)
+
+➡️ [37/67] Suche nach: Laurent Michel University of Connecticut contact
+⏱️ [Colly] Laurent Michel University of Connecticut contact: 3.84s
+✅ Found: Laurent Michel University of Connecticut => Emaillaurent.michel@uconn.edu (Score: 18)
+
+➡️ [38/67] Suche nach: William Milam Ford Motor Co contact
+⏱️ [Colly] William Milam Ford Motor Co contact: 3.87s
+⏱️ [Colly] William Milam Ford Motor Co contact: 2.79s
+⏱️ [Colly] William Milam Ford Motor Co: 2.71s
+⏱️ [Colly] William Milam Ford Motor Co: 2.40s
+⏱️ [Colly] William Milam Ford Motor Co: 3.15s
+⏱️ [Colly] William Milam Ford Motor Co: 3.30s
+⏱️ [PDF] William Milam Ford Motor Co: 0.01s
+✅ Found: William Milam Ford Motor Co => wmilam@ford.com (Score: 18)
+
+➡️ [39/67] Suche nach: Sayan Mitra University of Illinois at Urbana-Champaign contact
+⏱️ [Colly] Sayan Mitra University of Illinois at Urbana-Champaign contact: 2.85s
+⏱️ [Colly] Sayan Mitra University of Illinois at Urbana-Champaign contact: 4.47s
+✅ Found: Sayan Mitra University of Illinois at Urbana-Champaign => mitras@illinois.edu (Score: 10)
+
+➡️ [40/67] Suche nach: Andreas Naderlinger University of Salzburg contact
+⏱️ [Colly] Andreas Naderlinger University of Salzburg contact: 2.81s
+✅ Found: Andreas Naderlinger University of Salzburg => andreas.naderlinger@cs.uni-salzburg.at (Score: 20)
+
+➡️ [41/67] Suche nach: Sam Nazari Draper Laboratory contact
+⏱️ [Colly] Sam Nazari Draper Laboratory contact: 3.25s
+✅ Found: Sam Nazari Draper Laboratory => sam.nazari@gmail.com (Score: 19)
+
+➡️ [42/67] Suche nach: Gabriela Nicolescu ‚Ecole Polytechnique de Montreal contact
+⏱️ [Colly] Gabriela Nicolescu ‚Ecole Polytechnique de Montreal contact: 5.00s
+✅ Found: Gabriela Nicolescu ‚Ecole Polytechnique de Montreal => gabriela.nicolescu@polymtl.ca (Score: 19)
+
+➡️ [43/67] Suche nach: Kurt N. Ochsie Boeing Co contact
+⏱️ [Colly] Kurt N. Ochsie Boeing Co contact: 2.83s
+⏱️ [Colly] Kurt N. Ochsie Boeing Co contact: 2.98s
+⏱️ [Colly] Kurt N. Ochsie Boeing Co contact: 2.20s
+⏱️ [Colly] Kurt N. Ochsie Boeing Co contact: 2.31s
+⏱️ [Colly] Kurt N. Ochsie Boeing Co contact: 2.56s
+⏱️ [Colly] Kurt N. Ochsie Boeing Co: 2.15s
+⏱️ [Colly] Kurt N. Ochsie Boeing Co: 3.00s
+⏱️ [Colly] Kurt N. Ochsie Boeing Co: 3.44s
+⏱️ [Colly] Kurt N. Ochsie Boeing Co: 3.86s
+⏱️ [Colly] Kurt N. Ochsie Boeing Co: 4.65s
+⏱️ [Colly] Kurt N. Ochsie Boeing Co: 3.29s
+⏱️ [Colly] Kurt N. Ochsie Boeing Co: 3.18s
+⏱️ [Colly] Kurt N. Ochsie Boeing Co: 1.74s
+⏱️ [Colly] Kurt N. Ochsie Boeing Co: 4.50s
+⏱️ [PDF] Kurt N. Ochsie Boeing Co: 0.06s
+✅ Found: Kurt N. Ochsie Boeing Co => fabric@ion.More (Score: 9)
+
+➡️ [44/67] Suche nach: Ian O'Connor ‚Ecole Centrale de Lyon contact
+⏱️ [Colly] Ian O'Connor ‚Ecole Centrale de Lyon contact: 2.62s
+✅ Found: Ian O'Connor ‚Ecole Centrale de Lyon => ian.oconnor@ec-lyon.fr (Score: 12)
+
+➡️ [45/67] Suche nach: Alex Ohata Toyota Motor Company contact
+⏱️ [Colly] Alex Ohata Toyota Motor Company contact: 2.59s
+⏱️ [Colly] Alex Ohata Toyota Motor Company contact: 2.88s
+⏱️ [Colly] Alex Ohata Toyota Motor Company contact: 3.26s
+⏱️ [Colly] Alex Ohata Toyota Motor Company contact: 2.31s
+⏱️ [Colly] Alex Ohata Toyota Motor Company contact: 2.16s
+⏱️ [Colly] Alex Ohata Toyota Motor Company contact: 2.60s
+⏱️ [Colly] Alex Ohata Toyota Motor Company contact: 5.40s
+⏱️ [Colly] Alex Ohata Toyota Motor Company contact: 0.57s
+⏱️ [Colly] Alex Ohata Toyota Motor Company contact: 1.53s
+⏱️ [Colly] Alex Ohata Toyota Motor Company: 2.65s
+⏱️ [Colly] Alex Ohata Toyota Motor Company: 5.94s
+⏱️ [Colly] Alex Ohata Toyota Motor Company: 2.61s
+⏱️ [Colly] Alex Ohata Toyota Motor Company: 3.14s
+⏱️ [Colly] Alex Ohata Toyota Motor Company: 3.19s
+⏱️ [Colly] Alex Ohata Toyota Motor Company: 1.71s
+⏱️ [Colly] Alex Ohata Toyota Motor Company: 2.76s
+⏱️ [Colly] Alex Ohata Toyota Motor Company: 2.68s
+⏱️ [Colly] Alex Ohata Toyota Motor Company: 3.22s
+⏱️ [PDF] Alex Ohata Toyota Motor Company: 0.01s
+⏱️ [PDF] Alex Ohata Toyota Motor Company: 0.00s
+DEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dictDEBUG: pdf.keyword(def)
+. Skip dict⏱️ [PDF] Alex Ohata Toyota Motor Company: 0.02s
+⏱️ [PDF] Alex Ohata Toyota Motor Company: 0.00s
+⏱️ [PDF] Alex Ohata Toyota Motor Company: 0.02s
+⏱️ [PDF] Alex Ohata Toyota Motor Company: 0.00s
+⏱️ [PDF] Alex Ohata Toyota Motor Company: 0.00s
+⏱️ [PDF] Alex Ohata Toyota Motor Company: 0.02s
+❌ Keine passende E-Mail gefunden für: Alex Ohata Toyota Motor Company
+
+➡️ [46/67] Suche nach: Taskin Padir Worcester Polytechnic Institute contact
+⏱️ [Colly] Taskin Padir Worcester Polytechnic Institute contact: 4.18s
+✅ Found: Taskin Padir Worcester Polytechnic Institute => t.padir@northeastern.edu (Score: 12)
+
+➡️ [47/67] Suche nach: Miroslav Pajic University of Pennsylvania contact
+⏱️ [Colly] Miroslav Pajic University of Pennsylvania contact: 4.36s
+✅ Found: Miroslav Pajic University of Pennsylvania => miroslav.pajic@duke.edu (Score: 18)
+
+➡️ [48/67] Suche nach: Krishna R. Pattipati University of Connecticut contact
+⏱️ [Colly] Krishna R. Pattipati University of Connecticut contact: 4.89s
+✅ Found: Krishna R. Pattipati University of Connecticut => krishna.pattipati@uconn.edu (Score: 19)
+
+➡️ [49/67] Suche nach: Dario Pompili Rutgers University contact
+⏱️ [Colly] Dario Pompili Rutgers University contact: 2.72s
+✅ Found: Dario Pompili Rutgers University => pompili@rutgers.edu (Score: 14)
+
+➡️ [50/67] Suche nach: Wolfgang Pree University of Salzburg contact
+⏱️ [Colly] Wolfgang Pree University of Salzburg contact: 4.47s
+⏱️ [Colly] Wolfgang Pree University of Salzburg contact: 3.81s
+⏱️ [Colly] Wolfgang Pree University of Salzburg contact: 2.69s
+⏱️ [Colly] Wolfgang Pree University of Salzburg contact: 2.39s
+⏱️ [Colly] Wolfgang Pree University of Salzburg contact: 2.67s
+⏱️ [Colly] Wolfgang Pree University of Salzburg contact: 3.11s
+⏱️ [Colly] Wolfgang Pree University of Salzburg contact: 4.41s
+⏱️ [Colly] Wolfgang Pree University of Salzburg contact: 3.76s
+⏱️ [Colly] Wolfgang Pree University of Salzburg contact: 0.67s
+⏱️ [Colly] Wolfgang Pree University of Salzburg: 2.49s
+⏱️ [Colly] Wolfgang Pree University of Salzburg: 3.40s
+⏱️ [Colly] Wolfgang Pree University of Salzburg: 3.10s
+⏱️ [Colly] Wolfgang Pree University of Salzburg: 2.16s
+⏱️ [Colly] Wolfgang Pree University of Salzburg: 0.63s
+⏱️ [Colly] Wolfgang Pree University of Salzburg: 2.72s
+⏱️ [Colly] Wolfgang Pree University of Salzburg: 2.96s
+⏱️ [Colly] Wolfgang Pree University of Salzburg: 3.76s
+⏱️ [Colly] Wolfgang Pree University of Salzburg: 3.06s
+⏱️ [Colly] Wolfgang Pree University of Salzburg: 2.89s
+⏱️ [PDF] Wolfgang Pree University of Salzburg: 0.01s
+✅ Found: Wolfgang Pree University of Salzburg => Wolfgang.Pree@cs.uni (Score: 18)
+
+➡️ [51/67] Suche nach: Bernhard Schätz fortiss GmbH contact
+⏱️ [Colly] Bernhard Schätz fortiss GmbH contact: 3.19s
+⏱️ [Colly] Bernhard Schätz fortiss GmbH contact: 4.20s
+⏱️ [Colly] Bernhard Schätz fortiss GmbH contact: 2.26s
+⏱️ [Colly] Bernhard Schätz fortiss GmbH contact: 1.53s
+⏱️ [Colly] Bernhard Schätz fortiss GmbH: 3.52s
+⏱️ [Colly] Bernhard Schätz fortiss GmbH: 2.42s
+⏱️ [PDF] Bernhard Schätz fortiss GmbH: 0.05s
+✅ Found: Bernhard Schätz fortiss GmbH => schaetz@fortiss.org (Score: 6)
+
+➡️ [52/67] Suche nach: Gunar Schirner Northeastern University contact
+⏱️ [Colly] Gunar Schirner Northeastern University contact: 4.93s
+✅ Found: Gunar Schirner Northeastern University => schirner@ece.northeastern.edu (Score: 13)
+
+➡️ [53/67] Suche nach: Ramesh Sethu General Motors contact
+⏱️ [Colly] Ramesh Sethu General Motors contact: 2.71s
+⏱️ [Colly] Ramesh Sethu General Motors contact: 6.08s
+⏱️ [Colly] Ramesh Sethu General Motors contact: 2.90s
+⏱️ [Colly] Ramesh Sethu General Motors contact: 5.94s
+⏱️ [Colly] Ramesh Sethu General Motors contact: 3.92s
+⏱️ [Colly] Ramesh Sethu General Motors contact: 2.16s
+⏱️ [Colly] Ramesh Sethu General Motors contact: 2.82s
+⏱️ [Colly] Ramesh Sethu General Motors contact: 3.14s
+⏱️ [Colly] Ramesh Sethu General Motors contact: 5.06s
+⏱️ [Colly] Ramesh Sethu General Motors contact: 1.25s
+⏱️ [Colly] Ramesh Sethu General Motors contact: 0.94s
+⏱️ [Colly] Ramesh Sethu General Motors contact: 1.27s
+⏱️ [Colly] Ramesh Sethu General Motors contact: 1.12s
+⏱️ [Colly] Ramesh Sethu General Motors contact: 0.99s
+⏱️ [Colly] Ramesh Sethu General Motors: 2.88s
+⏱️ [Colly] Ramesh Sethu General Motors: 1.32s
+⏱️ [Colly] Ramesh Sethu General Motors: 2.83s
+⏱️ [Colly] Ramesh Sethu General Motors: 3.03s
+⏱️ [Colly] Ramesh Sethu General Motors: 2.50s
+⏱️ [Colly] Ramesh Sethu General Motors: 1.41s
+⏱️ [Colly] Ramesh Sethu General Motors: 2.99s
+⏱️ [Colly] Ramesh Sethu General Motors: 0.99s
+⏱️ [Colly] Ramesh Sethu General Motors: 3.15s
+⏱️ [Colly] Ramesh Sethu General Motors: 2.24s
+⏱️ [Colly] Ramesh Sethu General Motors: 4.00s
+⏱️ [PDF] Ramesh Sethu General Motors: 0.06s
+✅ Found: Ramesh Sethu General Motors => ramesh.s@gm.com (Score: 11)
+
+➡️ [54/67] Suche nach: Frank Slomka Ulm University contact
+⏱️ [Colly] Frank Slomka Ulm University contact: 5.49s
+⏱️ [Colly] Frank Slomka Ulm University contact: 2.44s
+⏱️ [Colly] Frank Slomka Ulm University contact: 9.46s
+⏱️ [Colly] Frank Slomka Ulm University contact: 5.17s
+⏱️ [Colly] Frank Slomka Ulm University contact: 3.41s
+⏱️ [Colly] Frank Slomka Ulm University contact: 2.71s
+⏱️ [Colly] Frank Slomka Ulm University contact: 2.79s
+⏱️ [Colly] Frank Slomka Ulm University contact: 3.55s
+⏱️ [Colly] Frank Slomka Ulm University: 2.48s
+⏱️ [Colly] Frank Slomka Ulm University: 2.55s
+⏱️ [Colly] Frank Slomka Ulm University: 2.39s
+⏱️ [Colly] Frank Slomka Ulm University: 2.77s
+⏱️ [Colly] Frank Slomka Ulm University: 5.08s
+⏱️ [Colly] Frank Slomka Ulm University: 3.37s
+⏱️ [Colly] Frank Slomka Ulm University: 3.63s
+⏱️ [Colly] Frank Slomka Ulm University: 2.43s
+⏱️ [Colly] Frank Slomka Ulm University: 2.61s
+⏱️ [PDF] Frank Slomka Ulm University: 0.02s
+✅ Found: Frank Slomka Ulm University => frank.slomka@uni-ulm.de (Score: 24)
+
+➡️ [55/67] Suche nach: Mark Spong The University of Texas at Dallas contact
+⏱️ [Colly] Mark Spong The University of Texas at Dallas contact: 3.27s
+✅ Found: Mark Spong The University of Texas at Dallas => mspong@utdallas.edu (Score: 14)
+
+➡️ [56/67] Suche nach: Charles Taylor University of Louisiana at Lafayette contact
+⏱️ [Colly] Charles Taylor University of Louisiana at Lafayette contact: 5.45s
+✅ Found: Charles Taylor University of Louisiana at Lafayette => professorctaylor@louisiana.edu (Score: 14)
+
+➡️ [57/67] Suche nach: Russ Tedrake Massachusetts Institute of Technology contact
+⏱️ [Colly] Russ Tedrake Massachusetts Institute of Technology contact: 2.91s
+⏱️ [Colly] Russ Tedrake Massachusetts Institute of Technology contact: 2.75s
+✅ Found: Russ Tedrake Massachusetts Institute of Technology => russt@csail.mit.edu (Score: 10)
+
+➡️ [58/67] Suche nach: Ozer Unluhisarcikli ASML contact
+⏱️ [Colly] Ozer Unluhisarcikli ASML contact: 3.33s
+⏱️ [Colly] Ozer Unluhisarcikli ASML contact: 3.60s
+⏱️ [Colly] Ozer Unluhisarcikli ASML contact: 3.86s
+⏱️ [Colly] Ozer Unluhisarcikli ASML contact: 3.49s
+⏱️ [Colly] Ozer Unluhisarcikli ASML contact: 2.91s
+⏱️ [Colly] Ozer Unluhisarcikli ASML contact: 3.57s
+⏱️ [Colly] Ozer Unluhisarcikli ASML contact: 3.38s
+⏱️ [Colly] Ozer Unluhisarcikli ASML contact: 3.22s
+⏱️ [Colly] Ozer Unluhisarcikli ASML contact: 3.68s
+⏱️ [Colly] Ozer Unluhisarcikli ASML: 3.82s
+⏱️ [Colly] Ozer Unluhisarcikli ASML: 3.47s
+⏱️ [Colly] Ozer Unluhisarcikli ASML: 4.14s
+⏱️ [Colly] Ozer Unluhisarcikli ASML: 2.36s
+⏱️ [Colly] Ozer Unluhisarcikli ASML: 3.23s
+⏱️ [Colly] Ozer Unluhisarcikli ASML: 2.87s
+⏱️ [Colly] Ozer Unluhisarcikli ASML: 3.62s
+⏱️ [Colly] Ozer Unluhisarcikli ASML: 3.52s
+⏱️ [Colly] Ozer Unluhisarcikli ASML: 2.70s
+⏱️ [PDF] Ozer Unluhisarcikli ASML: 0.00s
+⏱️ [PDF] Ozer Unluhisarcikli ASML: 0.00s
+✅ Found: Ozer Unluhisarcikli ASML => ozer.unluhisarcikli@asml.com (Score: 26)
+
+➡️ [59/67] Suche nach: Hans Vangheluwe University of Antwerp/McGill University contact
+⏱️ [Colly] Hans Vangheluwe University of Antwerp/McGill University contact: 3.52s
+✅ Found: Hans Vangheluwe University of Antwerp/McGill University => Hans.Vangheluwe@uantwerp.be (Score: 18)
+
+➡️ [60/67] Suche nach: Daniel Varro Budapest University of Tech. and Economics contact
+⏱️ [Colly] Daniel Varro Budapest University of Tech. and Economics contact: 4.09s
+⏱️ [Colly] Daniel Varro Budapest University of Tech. and Economics contact: 3.44s
+✅ Found: Daniel Varro Budapest University of Tech. and Economics => varro@mit.bme.hu (Score: 9)
+
+➡️ [61/67] Suche nach: Yan Wan University of North Texas contact
+⏱️ [Colly] Yan Wan University of North Texas contact: 3.82s
+✅ Found: Yan Wan University of North Texas => yan.wan@uta.edu (Score: 15)
+
+➡️ [62/67] Suche nach: Alan Wassyng McMaster University contact
+⏱️ [Colly] Alan Wassyng McMaster University contact: 3.20s
+✅ Found: Alan Wassyng McMaster University => wassyng@mcmaster.ca (Score: 14)
+
+➡️ [63/67] Suche nach: David Wilson Auckland University of Technology contact
+⏱️ [Colly] David Wilson Auckland University of Technology contact: 3.66s
+⏱️ [Colly] David Wilson Auckland University of Technology contact: 6.65s
+⏱️ [Colly] David Wilson Auckland University of Technology contact: 4.85s
+⏱️ [Colly] David Wilson Auckland University of Technology contact: 3.14s
+⏱️ [Colly] David Wilson Auckland University of Technology contact: 2.35s
+⏱️ [Colly] David Wilson Auckland University of Technology contact: 3.46s
+⏱️ [Colly] David Wilson Auckland University of Technology contact: 4.26s
+✅ Found: David Wilson Auckland University of Technology => david.wilson@aut.ac.nz (Score: 21)
+
+➡️ [64/67] Suche nach: Alexander M. Wylginski Worcester Polytechnic Institute contact
+⏱️ [Colly] Alexander M. Wylginski Worcester Polytechnic Institute contact: 3.09s
+⏱️ [Colly] Alexander M. Wylginski Worcester Polytechnic Institute contact: 7.66s
+✅ Found: Alexander M. Wylginski Worcester Polytechnic Institute => alexw@wpi.edu (Score: 5)
+
+➡️ [65/67] Suche nach: Sergey Yurgenson Harvard Medical School contact
+⏱️ [Colly] Sergey Yurgenson Harvard Medical School contact: 3.12s
+✅ Found: Sergey Yurgenson Harvard Medical School => sergey_yurgenson@hms.harvard.edu (Score: 27)
+
+➡️ [66/67] Suche nach: Justyna Zander Worcester Polytechnic Institute/MathWorks contact
+⏱️ [Colly] Justyna Zander Worcester Polytechnic Institute/MathWorks contact: 3.39s
+⏱️ [Colly] Justyna Zander Worcester Polytechnic Institute/MathWorks contact: 3.40s
+✅ Found: Justyna Zander Worcester Polytechnic Institute/MathWorks => dr.justyna.zander@gmail.com (Score: 17)
+
+➡️ [67/67] Suche nach: Qi Zhu University of California Riverside contact
+⏱️ [Colly] Qi Zhu University of California Riverside contact: 3.33s
+⏱️ [Colly] Qi Zhu University of California Riverside contact: 3.55s
+⏱️ [Colly] Qi Zhu University of California Riverside contact: 4.42s
+✅ Found: Qi Zhu University of California Riverside => qzhu@northwestern.edu (Score: 10)
+1751275738
+⏱️ Gesamtdauer: 3388.75s
+✅ Results written to results_variante1.csv
+
+Process finished with the exit code 0

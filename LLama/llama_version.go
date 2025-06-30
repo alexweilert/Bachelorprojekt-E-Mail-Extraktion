@@ -14,18 +14,23 @@ import (
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
-	"github.com/agnivade/levenshtein"
 )
 
 const (
 	inputFile  = "list_of_names_and_affiliations.csv"
 	outputFile = "results_llama.csv"
-	//llamaModel = "llama2:7b"
-	llamaModel = "llama3.3:latest"
+	llamaModel = "llama2:7b"
 )
 
 type PersonEntry struct {
 	NameAndInstitution string
+}
+
+type ResultRow struct {
+	Name   string
+	Email  string
+	Time   string
+	Source string
 }
 
 func main() {
@@ -34,14 +39,20 @@ func main() {
 		panic(err)
 	}
 
-	results := make(map[string]string)
-	zeit := time.Now().Unix()
+	var results []ResultRow
+	totalStart := time.Now()
+	foundCount := 0
+
 	for i, entry := range entries {
 		fmt.Printf("\n➡️ [%d/%d] %s\n", i+1, len(entries), entry.NameAndInstitution)
+		start := time.Now()
+		row := ResultRow{Name: entry.NameAndInstitution, Email: "", Source: ""}
 
 		links, err := DuckDuckGoSearch(entry.NameAndInstitution)
 		if err != nil || len(links) == 0 {
 			fmt.Println("⚠️ DuckDuckGo fehlgeschlagen.")
+			row.Time = fmt.Sprintf("%.2fs", time.Since(start).Seconds())
+			results = append(results, row)
 			continue
 		}
 
@@ -54,25 +65,33 @@ func main() {
 
 			prompt := BuildLlamaPrompt(entry.NameAndInstitution, text)
 			email, err := QueryLlamaREST(prompt)
-			if err == nil && isValidEmail(email) {
-				results[entry.NameAndInstitution] = email
-				fmt.Printf("✅ LLaMA Gefunden: %s\n", email)
-				break
+			if err == nil {
+				email = sanitizeEmail(email)
+				if email != "" {
+					row.Email = email
+					row.Source = link
+					foundCount++
+					fmt.Printf("✅ LLaMA Gefunden: %s\n", email)
+					break
+				}
 			}
 		}
+		row.Time = fmt.Sprintf("%.2fs", time.Since(start).Seconds())
+		results = append(results, row)
 
 		if i%5 == 0 {
 			fmt.Printf("🔄 Fortschritt: %d von %d verarbeitet\n", i+1, len(entries))
 		}
 	}
-	zeit = time.Now().Unix() - zeit
-	fmt.Println(zeit)
+	totalDuration := time.Since(totalStart)
+	fmt.Printf("\n✅ %d von %d E-Mails gefunden\n", foundCount, len(entries))
+	fmt.Printf("⏱️ Gesamtdauer: %.2fs\n", totalDuration.Seconds())
 
 	err = WriteCSV(outputFile, results)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("\n✅ Ergebnisse gespeichert in:", outputFile)
+	fmt.Println("\n📄 Ergebnisse gespeichert in:", outputFile)
 }
 
 func ReadCSV(path string) ([]PersonEntry, error) {
@@ -92,14 +111,12 @@ func ReadCSV(path string) ([]PersonEntry, error) {
 		if err != nil || len(record) == 0 {
 			continue
 		}
-		entries = append(entries, PersonEntry{
-			NameAndInstitution: strings.TrimSpace(record[0]),
-		})
+		entries = append(entries, PersonEntry{strings.TrimSpace(record[0])})
 	}
 	return entries, nil
 }
 
-func WriteCSV(path string, results map[string]string) error {
+func WriteCSV(path string, results []ResultRow) error {
 	f, err := os.Create(path)
 	if err != nil {
 		return err
@@ -108,9 +125,9 @@ func WriteCSV(path string, results map[string]string) error {
 
 	w := csv.NewWriter(f)
 	defer w.Flush()
-	_ = w.Write([]string{"Name + Institution", "Email"})
-	for k, v := range results {
-		_ = w.Write([]string{k, v})
+	_ = w.Write([]string{"Name + Institution", "Email", "Zeit", "Gefunden auf"})
+	for _, row := range results {
+		_ = w.Write([]string{row.Name, row.Email, row.Time, row.Source})
 	}
 	return nil
 }
@@ -144,30 +161,22 @@ func DownloadPageText(pageURL string) (string, error) {
 	return builder.String(), nil
 }
 
-func extractEmails(text string) []string {
-	re := regexp.MustCompile(`(?i)\b[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}\b`)
-	return re.FindAllString(text, -1)
-}
-
-func findClosestEmail(name string, emails []string) string {
-	bestEmail := ""
-	lowestDistance := 1000
-	name = strings.ToLower(name)
-
-	for _, email := range emails {
-		distance := levenshtein.ComputeDistance(name, strings.ToLower(email))
-		if distance < lowestDistance {
-			lowestDistance = distance
-			bestEmail = email
-		}
-	}
-	return bestEmail
-}
-
 func BuildLlamaPrompt(name string, text string) string {
-	return fmt.Sprintf(
-		"Extrahiere eine E-Mail-Adresse aus folgendem Text, die möglichst gut zu \"%s\" passt:\n\n%s\n\nAntwort nur mit der E-Mail.",
-		name, text)
+	return fmt.Sprintf(`Die folgende Person heißt "%s". Der folgende Text enthält möglicherweise Kontaktinformationen.
+
+Bitte finde genau **eine einzige** E-Mail-Adresse, die **am besten** zu dieser Person passt.
+Beachte:
+- Nutze auch Initialen oder Namensfragmente (z. B. j.smith für John Smith).
+- Bevorzuge E-Mails mit Bezug zu Institutionen (z. B. Universitäten).
+- Gib **nur die E-Mail-Adresse** zurück – **ohne Anführungszeichen, Klammern oder Sonderzeichen**.
+- Wenn keine passende E-Mail gefunden wurde, gib einfach "" zurück.
+
+Text:
+---
+%s
+---
+
+Antwort nur mit der E-Mail-Adresse:`, name, text)
 }
 
 func QueryLlamaREST(prompt string) (string, error) {
@@ -181,7 +190,7 @@ func QueryLlamaREST(prompt string) (string, error) {
 
 	req, err := http.NewRequest("POST", "http://localhost:11434/api/generate", bytes.NewBuffer(body))
 	if err != nil {
-		return "Fehler beim Erstellen der Anfrage an LLaMA", err
+		return "", err
 	}
 	req.Header.Set("Content-Type", "application/json")
 
@@ -193,7 +202,6 @@ func QueryLlamaREST(prompt string) (string, error) {
 	}
 	defer resp.Body.Close()
 
-	// Vollständige Antwort dekodieren
 	var result map[string]interface{}
 	err = json.NewDecoder(resp.Body).Decode(&result)
 	if err != nil {
@@ -201,28 +209,39 @@ func QueryLlamaREST(prompt string) (string, error) {
 		return "", err
 	}
 
-	// Fehler in der LLaMA-Antwort erkennen
 	if errMsg, ok := result["error"].(string); ok && errMsg != "" {
 		fmt.Println("❌ LLaMA Fehler:", errMsg)
 		return "", fmt.Errorf("llama error: %s", errMsg)
 	}
 
-	// Reguläre Antwort extrahieren
 	if response, ok := result["response"].(string); ok && strings.TrimSpace(response) != "" {
-		return strings.TrimSpace(response), nil
+		emailLines := strings.Split(strings.TrimSpace(response), "\n")
+		for _, line := range emailLines {
+			clean := sanitizeEmail(line)
+			if clean != "" {
+				return clean, nil
+			}
+		}
 	}
 
-	// Leere oder ungültige Antwort
 	return "", fmt.Errorf("keine gültige Antwort von LLaMA erhalten")
 }
 
-func isValidEmail(email string) bool {
-	email = strings.TrimSpace(email)
+func sanitizeEmail(raw string) string {
+	email := strings.TrimSpace(raw)
+	email = strings.Trim(email, "<>\"' .,;:[]()")
+	email = strings.ReplaceAll(email, "mailto:", "")
+	email = strings.ReplaceAll(email, " ", "")
+
 	if strings.Count(email, "@") != 1 || len(email) > 100 {
-		return false
+		return ""
 	}
+
 	re := regexp.MustCompile(`(?i)\b[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}\b`)
-	return re.MatchString(email)
+	if re.MatchString(email) {
+		return email
+	}
+	return ""
 }
 
 func DuckDuckGoSearch(query string) ([]string, error) {
