@@ -3,12 +3,13 @@ package main
 import (
 	"fmt"
 	"github.com/gocolly/colly"
-	"net/mail"
 	"regexp"
 	"strings"
 	"time"
 )
 
+// ExtractEmailWithColly besucht eine URL, extrahiert Kandidaten und bewertet mit getScoreOrgGeneral.
+// Der Parameter 'name' wird als "Name + Organisation" interpretiert.
 func ExtractEmailWithColly(url string, name string) (string, int, error) {
 	start := time.Now()
 	c := colly.NewCollector(
@@ -21,70 +22,77 @@ func ExtractEmailWithColly(url string, name string) (string, int, error) {
 		RandomDelay: 1 * time.Second,
 	})
 
+	// generisches E-Mail-Muster
 	emailPattern := regexp.MustCompile(`(?i)\b[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}\b`)
 	allEmails := make(map[string]bool)
 	var bestEmail string
 	highestScore := -1
+	// ——— Name + Organisation heuristisch aus "name" ableiten (robust gg. Suchzusätze) ———
+	firstName, middleName, lastName, org := splitNameAndOrg(cleanQueryNoise(name))
 
-	firstName, middleName, lastName := extractNameParts(name)
-
-	checkAndAddEmail := func(email string) {
-		clean := sanitizeEmail(email)
-		if clean == "" {
+	checkAndAddEmail := func(raw string) {
+		mail := extractEmailFromText(raw) // <— statt sanitizeEmail(raw)
+		if mail == "" {
 			return
 		}
-		cleanLower := strings.ToLower(clean)
+		score := getScoreOrgGeneral(strings.ToLower(mail), firstName, middleName, lastName, org)
 
-		score := getScore(cleanLower, firstName, middleName, lastName)
-
-		allEmails[clean] = true
+		allEmails[mail] = true
 		if score > highestScore {
-			bestEmail = clean
+			bestEmail = mail
 			highestScore = score
 		}
 	}
 
 	c.OnHTML("body", func(e *colly.HTMLElement) {
-		// 1. Normale E-Mail-Erkennung im Text
+		// 1) Normale E-Mail-Erkennung im sichtbaren Text
 		for _, match := range emailPattern.FindAllString(e.Text, -1) {
 			checkAndAddEmail(match)
 		}
+		// 1b) SYMBOLISCHE Erkennung im sichtbaren Text
+		//for _, em := range extractSymbolicEmails(e.Text) {
+		for _, em := range extractSymbolicEmailsStrict(e.Text, org) {
+			checkAndAddEmail(em)
+		}
 
-		// 2. E-Mail-Fragmente zusammensetzen (z. B. Wolfgang.PREE<span>@sbg.ac.at</span>)
+		// 2) Fragmentierte HTML-Varianten
 		rawHTML, _ := e.DOM.Html()
 		fragmentedEmailPattern := regexp.MustCompile(`([a-zA-Z0-9._%+\-]+)<span[^>]*?>.*?</span>@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}`)
 		for _, match := range fragmentedEmailPattern.FindAllString(rawHTML, -1) {
-			clean := stripHTMLTags(match)
-			clean = strings.ReplaceAll(clean, "\n", "")
-			checkAndAddEmail(clean)
+			stripped := stripHTMLTags(match)
+			stripped = strings.ReplaceAll(stripped, "\n", "")
+			checkAndAddEmail(stripped)
 		}
 
-		// 3. MS Word / MsoNormal Varianten direkt im HTML
+		// 3) MSO/Alternative
 		altEmailPattern := regexp.MustCompile(`(?i)([a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,})`)
 		for _, match := range altEmailPattern.FindAllString(rawHTML, -1) {
 			checkAndAddEmail(match)
 		}
+		// 3b) SYMBOLISCHE Erkennung im HTML (falls Text nicht gereicht hat)
+		//for _, em := range extractSymbolicEmails(rawHTML) {
+		for _, em := range extractSymbolicEmailsStrict(rawHTML, org) {
+			checkAndAddEmail(em)
+		}
 	})
 
-	// mailto: links
+	// 4) mailto:-Links
 	c.OnHTML("a[href^='mailto:']", func(e *colly.HTMLElement) {
 		text := e.Text
 		href := strings.TrimPrefix(e.Attr("href"), "mailto:")
-
-		sources := []string{href, text}
-		for _, src := range sources {
-			for _, match := range emailPattern.FindAllString(src, -1) {
-				checkAndAddEmail(match)
+		for _, src := range []string{href, text} {
+			// nicht regexpen, sondern robust extrahieren:
+			if mail := extractEmailFromText(src); mail != "" {
+				checkAndAddEmail(mail)
 			}
 		}
 	})
 
-	err := c.Visit(url)
-	if err != nil {
+	if err := c.Visit(url); err != nil {
 		return "", 0, err
 	}
 
-	// Fallback: gib erste gültige E-Mail zurück
+	// Fallback: erste valide Adresse
 	if bestEmail == "" {
 		for email := range allEmails {
 			bestEmail = email
@@ -93,8 +101,7 @@ func ExtractEmailWithColly(url string, name string) (string, int, error) {
 		}
 	}
 
-	duration := time.Since(start)
-	fmt.Printf("⏱️ [Colly] %s: %.2fs\n", name, duration.Seconds())
+	fmt.Printf("⏱️ [Colly] %s: %.2fs\n", name, time.Since(start).Seconds())
 
 	if bestEmail == "" {
 		return "", 0, fmt.Errorf("keine E-Mail extrahiert")
@@ -103,40 +110,38 @@ func ExtractEmailWithColly(url string, name string) (string, int, error) {
 	return bestEmail, highestScore, nil
 }
 
-// Entfernt unerwünschte Zeichen & schneidet nach TLD sauber ab
-func sanitizeEmail(raw string) string {
-	clean := strings.TrimSpace(raw)
-	clean = strings.ReplaceAll(clean, "%40", "@")
-	clean = strings.TrimRight(clean, ".;, \t\n\r\"'›»")
+// NEU: symbolische E-Mails aus freiem Text extrahieren (at/dot-Varianten)
+func extractSymbolicEmails(text string) []string {
+	// etwas „robustere“ Erkennung: username [at|@] domain [dot|.] tld
+	// wir verlangen mind. EINEN Punkt nach dem Zusammensetzen
+	reSym := regexp.MustCompile(`(?i)([a-z0-9._+\-]{1,64})\s*(?:\(|\[)?\s*at\s*(?:\)|\])?\s*([a-z0-9.\-\s\[\]\(\)]{1,200})`)
+	cands := []string{}
+	matches := reSym.FindAllStringSubmatch(text, -1)
+	for _, m := range matches {
+		local := strings.ToLower(strings.TrimSpace(m[1]))
+		rawDomain := strings.ToLower(m[2])
+		// " dot " / "(dot)" / "[dot]" / reale Punkte → echte Punkte, Whitespaces raus
+		d := rawDomain
+		replacements := []string{" (dot) ", " dot ", "[dot]", "(dot)", " dot", "dot "}
+		for _, r := range replacements {
+			d = strings.ReplaceAll(d, r, ".")
+		}
+		d = strings.ReplaceAll(d, " ", "")
+		d = strings.ReplaceAll(d, "[.]", ".")
+		d = strings.ReplaceAll(d, "(.)", ".")
+		// minimal säubern (mehrfachpunkte reduzieren)
+		d = regexp.MustCompile(`\.{2,}`).ReplaceAllString(d, ".")
 
-	if strings.Count(clean, "@") != 1 || strings.Contains(clean, " ") {
-		return ""
+		// harte Filter: Local & Domain plausibel?
+		if local == "" || len(local) > 64 || !regexp.MustCompile(`^[a-z0-9._+\-]+$`).MatchString(local) {
+			continue
+		}
+		if !validDomain(d) {
+			continue
+		}
+		cands = append(cands, local+"@"+d)
 	}
-
-	idx := strings.Index(clean, "@")
-	if idx == -1 || strings.ContainsAny(clean[:idx], "0123456789") {
-		return ""
-	}
-
-	// Schneide nach offizieller TLD sauber ab (falls nötig)
-	clean = truncateEmailAfterTLD(clean)
-
-	// Validierung mit net/mail
-	if _, err := mail.ParseAddress(clean); err != nil {
-		return ""
-	}
-
-	return clean
-}
-
-// Trunkiert alles nach einer gültigen Domain-Endung wie .edu, .it etc.
-func truncateEmailAfterTLD(email string) string {
-	tldPattern := regexp.MustCompile(`(?i)(@[\w\.\-]+\.(edu|com|org|net|gov|ca|de|uk|au|ch|fr|be|it|nl))`)
-	loc := tldPattern.FindStringIndex(email)
-	if loc != nil {
-		return email[:loc[1]]
-	}
-	return email
+	return cands
 }
 
 func stripHTMLTags(input string) string {

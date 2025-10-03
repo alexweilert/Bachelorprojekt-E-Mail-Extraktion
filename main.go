@@ -1,11 +1,27 @@
-// main.go
 package main
 
 import (
 	"fmt"
+	"math/rand"
+	"net/url"
+	"os"
+	"regexp"
 	"strings"
 	"time"
 )
+
+// -------------------- Schwellwerte / Limits --------------------
+
+const (
+	maxLinksPhase1   = 10
+	maxLinksFallback = 10
+	maxLinksPDF      = 10
+
+	hardAcceptScore   = 14 // sehr sicher -> sofort final
+	consensusMinScore = 6  // Konsens braucht mind. diesen Score
+)
+
+// -------------------- Kandidaten-Aggregation -------------------
 
 type ResultRow struct {
 	Name   string
@@ -14,170 +30,337 @@ type ResultRow struct {
 	Source string
 }
 
+type candInfo struct {
+	bestScore int
+	sources   map[string]struct{} // Set verschiedener Quellen (Host+Path)
+}
+
+// --------------------------- main ------------------------------
+
 func main() {
+	// Eingabedatei (optional via CLI-Arg überschreibbar)
 	inputFile := "list_of_names_and_affiliations.csv"
-	outputFile := "results_variante1.csv"
+	if len(os.Args) > 1 && strings.TrimSpace(os.Args[1]) != "" {
+		inputFile = os.Args[1]
+	}
 
 	entries, err := ReadCSV(inputFile)
 	if err != nil {
-		panic(err)
+		fmt.Printf("Fehler beim Lesen der CSV (%s): %v\n", inputFile, err)
+		return
 	}
+	if len(entries) == 0 {
+		fmt.Println("Keine Einträge in der CSV gefunden.")
+		return
+	}
+	fmt.Printf("📄 Eingelesen: %d Einträge aus %s\n", len(entries), inputFile)
 
-	var results []ResultRow
+	results := make([]ResultRow, 0, len(entries))
 	foundCount := 0
-	totalStart := time.Now()
+	startAll := time.Now()
 
-	fmt.Println("🔢 Anzahl geladener Zeilen:", len(entries))
-	fmt.Println(time.Now().Unix())
+PERSON_LOOP:
 	for i, entry := range entries {
-		contactQuery := entry.NameAndInstitution + " contact"
-		fmt.Printf("\n➡️ [%d/%d] Suche nach: %s\n", i+1, len(entries), contactQuery)
-		start := time.Now()
-
-		row := ResultRow{Name: entry.NameAndInstitution, Email: "", Source: ""}
-
-		links, err := DuckDuckGoSearch(contactQuery)
-		if err != nil || len(links) == 0 {
-			fmt.Println("⚠️ DuckDuckGo fehlgeschlagen, versuche es später erneut.")
-			row.Time = fmt.Sprintf("%.2fs", time.Since(start).Seconds())
-			results = append(results, row)
+		if i > 0 {
+			time.Sleep(time.Duration(3000+rand.Intn(3000)) * time.Millisecond)
+		}
+		contactQuery := buildQuery(entry)
+		if contactQuery == "" {
 			continue
 		}
 
-		bestEmail := ""
-		bestScore := -1
-		lastEmail := ""
-		sameEmailStreak := 0
-		emailScores := make(map[string]int)
+		fmt.Printf("\n➡️ [%d/%d] Suche nach: %s\n", i+1, len(entries), contactQuery)
 
-		for _, link := range links {
-			email, score, err := ExtractEmailWithColly(link, contactQuery)
+		row := ResultRow{Name: contactQuery, Email: "", Source: ""}
+
+		// Kandidaten sammeln über alle Phasen
+		candidates := map[string]*candInfo{}
+
+		// ----------------- Phase 1: DDG → Colly → Chromedp -----------------
+		/*
+			phase1Links, err := DuckDuckGoSearch(contactQuery)
+			if err != nil {
+				fmt.Printf("⚠️ DuckDuckGo fehlgeschlagen: %v\n", err)
+				phase1Links = nil
+			}
+			fmt.Printf("🔎 Phase1: %d Links\n", len(phase1Links))
+
+			if len(phase1Links) > maxLinksPhase1 {
+				phase1Links = phase1Links[:maxLinksPhase1]
+			}
+
+				// Colly mit Early-Accept
+				if finalized, email, src := processLinksCollyEarly(phase1Links, contactQuery, candidates); finalized {
+					row.Email, row.Source = email, src
+					addResultOnce(&results, row)
+					foundCount++
+					fmt.Printf("✅ Found (early): %s => %s\n", contactQuery, row.Email)
+					continue PERSON_LOOP
+				}
+
+
+				// Chromedp mit Early-Accept
+				if finalized, email, src := processLinksChromedpEarly(phase1Links, contactQuery, candidates); finalized {
+					row.Email, row.Source = email, src
+					addResultOnce(&results, row)
+					foundCount++
+					fmt.Printf("✅ Found (early): %s => %s\n", contactQuery, row.Email)
+					continue PERSON_LOOP
+				}
+
+				// ----------------- Fallback: „email address“ -----------------------
+				fallbackQuery := contactQuery + " email address"
+				fallbackLinks, ferr := DuckDuckGoSearch(fallbackQuery)
+				if ferr != nil {
+					fmt.Printf("⚠️ DuckDuckGo Fallback fehlgeschlagen: %v\n", ferr)
+					fallbackLinks = nil
+				}
+				fmt.Printf("🔎 Fallback: %d Links\n", len(fallbackLinks))
+				if len(fallbackLinks) > maxLinksFallback {
+					fallbackLinks = fallbackLinks[:maxLinksFallback]
+				}
+
+				// Colly mit Early-Accept
+				if finalized, email, src := processLinksCollyEarly(fallbackLinks, contactQuery, candidates); finalized {
+					row.Email, row.Source = email, src
+					addResultOnce(&results, row)
+					foundCount++
+					fmt.Printf("✅ Found (early): %s => %s\n", contactQuery, row.Email)
+					continue PERSON_LOOP
+				}
+
+				// Chromedp mit Early-Accept
+				if finalized, email, src := processLinksChromedpEarly(fallbackLinks, contactQuery, candidates); finalized {
+					row.Email, row.Source = email, src
+					addResultOnce(&results, row)
+					foundCount++
+					fmt.Printf("✅ Found (early): %s => %s\n", contactQuery, row.Email)
+					continue PERSON_LOOP
+				}
+		*/
+		// ----------------- Phase 2: PDFs -----------------------------------
+		pdfQuery := contactQuery + " filetype:pdf"
+		pdfLinks, perr := DuckDuckGoPDFSearch(pdfQuery)
+		if perr != nil {
+			fmt.Printf("⚠️ DuckDuckGo (PDF) Fehler: %v\n", perr)
+			pdfLinks = nil
+		}
+		fmt.Printf("🔎 PDF: %d Links\n", len(pdfLinks))
+		if len(pdfLinks) > maxLinksPDF {
+			pdfLinks = pdfLinks[:maxLinksPDF]
+		}
+
+		for _, pdfURL := range pdfLinks {
+			time.Sleep(time.Duration(3000+rand.Intn(900)) * time.Millisecond)
+			tmp, terr := os.CreateTemp("", "emailpdf_*.pdf")
+			if terr != nil {
+				continue
+			}
+			tmp.Close()
+			defer os.Remove(tmp.Name())
+
+			if derr := DownloadPDF(pdfURL, tmp.Name()); derr != nil {
+				continue
+			}
+
+			start := time.Now()
+			email, score, err := ExtractEmailsFromPDF(tmp.Name(), contactQuery)
+			fmt.Printf("⏱️ [PDF fast] %s: %.2fs\n", contactQuery, time.Since(start).Seconds())
 			if err != nil || email == "" {
 				continue
 			}
-			if updateBestEmail(email, score, &lastEmail, &sameEmailStreak, &bestEmail, &bestScore, emailScores) || score >= 5 {
-				row.Email = bestEmail
-				row.Source = link
-				break
+			registerCandidate(candidates, email, score, pdfURL)
+			// Early-Accept in PDF-Phase
+			if shouldEarlyAccept(candidates, email, score) {
+				row.Email, row.Source = email, pdfURL
+				addResultOnce(&results, row)
+				foundCount++
+				fmt.Printf("✅ Found (early): %s => %s\n", contactQuery, row.Email)
+				continue PERSON_LOOP
 			}
 		}
 
-		if row.Email == "" || (bestScore < 7 && sameEmailStreak <= 1) {
-			for _, link := range links {
-				email, score, err := ExtractEmailFromURL(link, contactQuery)
-				if err != nil || email == "" {
-					continue
-				}
-				if updateBestEmail(email, score, &lastEmail, &sameEmailStreak, &bestEmail, &bestScore, emailScores) || score >= 5 {
-					row.Email = bestEmail
-					row.Source = link
-					break
-				}
-				if strings.Contains(email, "cgc") {
-					fmt.Printf("%s, %d", email, score)
-				}
-			}
-		}
+		// ----------------- Finale Auswahl (wenn kein Early-Accept) ----------
+		finalEmail, finalSource := pickFinal(candidates, consensusMinScore)
+		row.Email = finalEmail
+		row.Source = finalSource
 
-		if row.Email == "" || (bestScore < 7 && sameEmailStreak <= 1) {
-			fallbackQuery := entry.NameAndInstitution + " email address"
-			fallbackLinks, err := DuckDuckGoSearch(fallbackQuery)
-			if err != nil || len(fallbackLinks) == 0 {
-				fmt.Println("⚠️ DuckDuckGo-Fallback fehlgeschlagen, versuche es später erneut.")
-			} else {
-				for _, link := range fallbackLinks {
-					email, score, err := ExtractEmailWithColly(link, entry.NameAndInstitution)
-					if err == nil && email != "" {
-						if updateBestEmail(email, score, &lastEmail, &sameEmailStreak, &bestEmail, &bestScore, emailScores) || score >= 5 {
-							row.Email = bestEmail
-							row.Source = link
-							break
-						}
-					}
-					if row.Email == "" || (bestScore < 7 && sameEmailStreak <= 1) {
-						email, score, err := ExtractEmailFromURL(link, entry.NameAndInstitution)
-						if err == nil && email != "" {
-							if updateBestEmail(email, score, &lastEmail, &sameEmailStreak, &bestEmail, &bestScore, emailScores) || score >= 5 {
-								row.Email = bestEmail
-								row.Source = link
-								break
-							}
-						}
-					}
-				}
-			}
-		}
+		addResultOnce(&results, row)
 
-		if row.Email == "" || (bestScore < 7 && sameEmailStreak <= 1) {
-			pdfQuery := entry.NameAndInstitution + " filetype:pdf"
-			pdfLinks, err := DuckDuckGoPDFSearch(pdfQuery)
-			if err == nil && len(pdfLinks) > 0 {
-				for _, pdfURL := range pdfLinks {
-					filename := "temp.pdf"
-					err := DownloadPDF(pdfURL, filename)
-					if err == nil {
-						email, score, err := ExtractEmailsFromPDF(filename, entry.NameAndInstitution)
-						if err == nil && email != "" {
-							if updateBestEmail(email, score, &lastEmail, &sameEmailStreak, &bestEmail, &bestScore, emailScores) || score >= 5 {
-								row.Email = bestEmail
-								row.Source = pdfURL
-								break
-							}
-						}
-					}
-				}
-			}
-		}
-
-		row.Time = fmt.Sprintf("%.2fs", time.Since(start).Seconds())
-		results = append(results, row)
 		if row.Email != "" {
 			foundCount++
-			fmt.Printf("✅ Found: %s => %s (Score: %d)\n", entry.NameAndInstitution, bestEmail, bestScore)
+			fmt.Printf("✅ Found: %s => %s\n", contactQuery, row.Email)
 		} else {
-			fmt.Printf("❌ Keine passende E-Mail gefunden für: %s\n", entry.NameAndInstitution)
+			fmt.Printf("❌ Keine passende E-Mail gefunden für: %s\n", contactQuery)
 		}
 	}
 
-	fmt.Println(time.Now().Unix())
-	totalDuration := time.Since(totalStart)
-	fmt.Printf("⏱️ Gesamtdauer: %.2fs\n", totalDuration.Seconds())
-
-	err = WriteCSV(outputFile, results)
-	if err != nil {
-		panic(err)
+	// Ausgabe schreiben
+	output := fmt.Sprintf("results_%d.csv", time.Now().Unix())
+	if err := WriteCSV(output, results); err != nil {
+		fmt.Printf("Fehler beim Schreiben der Ergebnisse: %v\n", err)
+	} else {
+		fmt.Printf("\n💾 Ergebnisse gespeichert in: %s  (Treffer: %d/%d)  ⏱️ Gesamt: %.2fs\n",
+			output, foundCount, len(entries), time.Since(startAll).Seconds())
 	}
-	fmt.Println("✅ Results written to", outputFile)
 }
 
-func updateBestEmail(
-	email string,
-	score int,
-	lastEmail *string,
-	sameEmailStreak *int,
-	bestEmail *string,
-	bestScore *int,
-	emailScores map[string]int,
-) bool {
-	if score > emailScores[email] {
-		emailScores[email] = score
+// --------------------------- Query-Helfer -----------------------
+
+func buildQuery(p PersonEntry) string {
+	name := strings.TrimSpace(p.Name)
+	inst := strings.TrimSpace(p.Institution)
+	q := strings.TrimSpace(strings.Join([]string{name, inst}, " "))
+	return sanitizeQuery(q)
+}
+
+// Entfernt E-Mails/URLs/TLD-Schnipsel aus der Such-Query
+func sanitizeQuery(q string) string {
+	q = strings.TrimSpace(q)
+	if q == "" {
+		return q
+	}
+	parts := strings.Fields(q)
+	clean := make([]string, 0, len(parts))
+
+	reEmail := regexp.MustCompile(`(?i)^[A-Z0-9._%+\-]+@[A-Z0-9.\-]+\.[A-Z]{2,}$`)
+	reURL := regexp.MustCompile(`(?i)^(https?://|www\.)`)
+
+	skipTLDish := func(s string) bool {
+		slow := strings.ToLower(s)
+		return strings.Contains(slow, "@") ||
+			strings.HasSuffix(slow, ".com") ||
+			strings.HasSuffix(slow, ".edu") ||
+			strings.HasSuffix(slow, ".org") ||
+			strings.HasSuffix(slow, ".net") ||
+			strings.Contains(slow, ".co.") ||
+			strings.Contains(slow, ".ac.") ||
+			strings.Contains(slow, ".uni") ||
+			strings.Contains(slow, ".gov")
 	}
 
-	if email == *lastEmail && score > 0 {
-		*sameEmailStreak++
-	} else {
-		*sameEmailStreak = 1
-		*lastEmail = email
+	for _, p := range parts {
+		if reEmail.MatchString(p) {
+			continue
+		}
+		if reURL.MatchString(p) {
+			continue
+		}
+		if skipTLDish(p) {
+			continue
+		}
+		clean = append(clean, p)
 	}
+	out := strings.Join(clean, " ")
+	return strings.Join(strings.Fields(out), " ")
+}
 
-	if emailScores[email] > *bestScore {
-		*bestEmail = email
-		*bestScore = emailScores[email]
+/*
+// --------------------- Link-Verarbeitung (+ Early) ---------------
+func processLinksCollyEarly(links []string, contactQuery string, candidates map[string]*candInfo) (finalized bool, email, source string) {
+	for _, link := range links {
+		start := time.Now()
+		em, score, err := ExtractEmailWithColly(link, contactQuery)
+		fmt.Printf("⏱️ [Colly] %s: %.2fs\n", contactQuery, time.Since(start).Seconds())
+		if err != nil || em == "" {
+			continue
+		}
+		registerCandidate(candidates, em, score, link)
+		if shouldEarlyAccept(candidates, em, score) {
+			return true, em, link
+		}
 	}
+	return false, "", ""
+}
 
-	if *sameEmailStreak >= 4 && *bestScore >= 3 {
-		fmt.Printf("[Abbruch] %s dreimal hintereinander gefunden → übernommen.\n", email)
+
+func processLinksChromedpEarly(links []string, contactQuery string, candidates map[string]*candInfo) (finalized bool, email, source string) {
+	for _, link := range links {
+		start := time.Now()
+		em, score, err := ExtractEmailFromURL(link, contactQuery)
+		fmt.Printf("⏱️ [Chromedp] %s: %.2fs\n", contactQuery, time.Since(start).Seconds())
+		if err != nil || em == "" {
+			continue
+		}
+		registerCandidate(candidates, em, score, link)
+		if shouldEarlyAccept(candidates, em, score) {
+			return true, em, link
+		}
+	}
+	return false, "", ""
+}
+
+*/
+
+// **Early-Accept Regel**: harter Score ODER Konsens erfüllt.
+func shouldEarlyAccept(cands map[string]*candInfo, email string, score int) bool {
+	if score >= hardAcceptScore {
+		return true
+	}
+	info := cands[email]
+	if info != nil && info.bestScore >= consensusMinScore {
 		return true
 	}
 	return false
 }
+
+// ----------------- Kandidaten / Finale Auswahl ------------------
+
+func registerCandidate(cands map[string]*candInfo, email string, score int, src string) {
+	if email == "" {
+		return
+	}
+	info, ok := cands[email]
+	if !ok {
+		info = &candInfo{bestScore: score, sources: map[string]struct{}{}}
+		cands[email] = info
+	} else if score > info.bestScore {
+		info.bestScore = score
+	}
+	info.sources[sourceKey(src)] = struct{}{}
+}
+
+// Finale Entscheidung, wenn kein Early-Accept erfolgte
+func pickFinal(cands map[string]*candInfo, minScore int) (email, source string) {
+	// 1) Konsens bevorzugen
+	for em, info := range cands {
+		if info.bestScore >= minScore {
+			return em, "(consensus)"
+		}
+	}
+	// 2) sonst besten Kandidaten nehmen
+	bestEmail, bestScore := "", -1
+	for em, info := range cands {
+		if info.bestScore > bestScore {
+			bestScore = info.bestScore
+			bestEmail = em
+		}
+	}
+	if bestEmail != "" {
+		return bestEmail, "(best-overall)"
+	}
+	return "", ""
+}
+
+// Quelle komprimieren (Domain + Pfad). Wenn nur Domain gewünscht: return u.Host
+func sourceKey(link string) string {
+	u, err := url.Parse(link)
+	if err != nil || u.Host == "" {
+		return strings.TrimSpace(link)
+	}
+	return u.Host + u.Path
+}
+
+// --------------- Dedupe-Guard fürs Result -----------------------
+var seenResults = map[string]struct{}{}
+
+func addResultOnce(results *[]ResultRow, row ResultRow) {
+	key := strings.ToLower(strings.TrimSpace(row.Name)) + "|" + strings.ToLower(strings.TrimSpace(row.Email))
+	if _, ok := seenResults[key]; ok {
+		return
+	}
+	seenResults[key] = struct{}{}
+	*results = append(*results, row)
+}
+
+func init() { rand.Seed(time.Now().UnixNano()) }

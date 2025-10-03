@@ -1,5 +1,6 @@
 package main
 
+/*
 import (
 	"bytes"
 	"encoding/csv"
@@ -283,3 +284,6 @@ func DuckDuckGoSearch(query string) ([]string, error) {
 
 	return urls, nil
 }
+
+
+*/

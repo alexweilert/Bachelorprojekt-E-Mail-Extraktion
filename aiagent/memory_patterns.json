@@ -1,0 +1,59 @@
+{
+  "bu.edu": {
+    "patterns": [],
+    "examples": [
+      {
+        "name": "Christos Cassandras",
+        "email": "cgc@bu.edu"
+      },
+      {
+        "name": "John Baillieul",
+        "email": "johnb@bu.edu"
+      },
+      {
+        "name": "Michael Caramanis",
+        "email": "mcaraman@bu.edu"
+      }
+    ]
+  },
+  "uci.edu": {
+    "patterns": [],
+    "examples": [
+      {
+        "name": "Mohammad Al Faruque",
+        "email": "alfaruqu@uci.edu"
+      }
+    ]
+  },
+  "ist.uni-stuttgart.de": {
+    "patterns": [],
+    "examples": [
+      {
+        "name": "Frank Allgöwer",
+        "email": "allgower@ist.uni-stuttgart.de"
+      }
+    ]
+  },
+  "uconn.edu": {
+    "patterns": [
+      "first.last"
+    ],
+    "examples": [
+      {
+        "name": "George Bollas",
+        "email": "george.bollas@uconn.edu"
+      }
+    ]
+  },
+  "utrc.utc.com": {
+    "patterns": [
+      "first.last"
+    ],
+    "examples": [
+      {
+        "name": "Isaac Cohen",
+        "email": "isaac.cohen@utrc.utc.com"
+      }
+    ]
+  }
+}

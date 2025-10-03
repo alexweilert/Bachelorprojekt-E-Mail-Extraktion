@@ -1,0 +1,34 @@
+{
+  "Boston University": {
+    "domains": [
+      "bu.edu",
+      "network.expertisefinder.com",
+      "tcr-us.com"
+    ],
+    "directory_hints": []
+  },
+  "University of California Irvine": {
+    "domains": [
+      "ucits.org"
+    ],
+    "directory_hints": []
+  },
+  "University of Stuttgart": {
+    "domains": [
+      "tc.ifac-control.org"
+    ],
+    "directory_hints": []
+  },
+  "University of Connecticut": {
+    "domains": [
+      "contactout.com"
+    ],
+    "directory_hints": []
+  },
+  "UTRC": {
+    "domains": [
+      "cvpr2011.thecvf.com"
+    ],
+    "directory_hints": []
+  }
+}
