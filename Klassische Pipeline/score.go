@@ -1,4 +1,4 @@
-package main
+package Klassische_Pipeline
 
 import (
 	"regexp"

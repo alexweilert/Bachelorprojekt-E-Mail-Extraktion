@@ -1,6 +1,7 @@
 package main
 
 import (
+	"Bachelorprojekt/Klassische Pipeline"
 	"bytes"
 	"context"
 	"fmt"
@@ -50,7 +51,7 @@ func main() {
 		inputFile = os.Args[1]
 	}
 
-	entries, err := ReadCSV(inputFile)
+	entries, err := Klassische_Pipeline.ReadCSV(inputFile)
 	if err != nil {
 		fmt.Printf("Fehler beim Lesen der CSV (%s): %v\n", inputFile, err)
 		return
@@ -86,7 +87,7 @@ PERSON_LOOP:
 		candidates := map[string]*candInfo{}
 
 		// ----------------- Phase 1: DDG → Colly → Chromedp -----------------
-		phase1Links, err := DuckDuckGoSearch(contactQuery)
+		phase1Links, err := Klassische_Pipeline.DuckDuckGoSearch(contactQuery)
 		if err != nil {
 			fmt.Printf("⚠️ DuckDuckGo fehlgeschlagen: %v\n", err)
 			phase1Links = nil
@@ -117,7 +118,7 @@ PERSON_LOOP:
 
 		// ----------------- Fallback: „email address“ -----------------------
 		fallbackQuery := contactQuery + " email address"
-		fallbackLinks, ferr := DuckDuckGoSearch(fallbackQuery)
+		fallbackLinks, ferr := Klassische_Pipeline.DuckDuckGoSearch(fallbackQuery)
 		if ferr != nil {
 			fmt.Printf("⚠️ DuckDuckGo Fallback fehlgeschlagen: %v\n", ferr)
 			fallbackLinks = nil
@@ -147,7 +148,7 @@ PERSON_LOOP:
 
 		// ----------------- Phase 2: PDFs -----------------------------------
 		pdfQuery := contactQuery + " filetype:pdf"
-		pdfLinks, perr := DuckDuckGoPDFSearch(pdfQuery)
+		pdfLinks, perr := Klassische_Pipeline.DuckDuckGoPDFSearch(pdfQuery)
 
 		// ----- Worker-Mode für sichere PDF-Analyse (Subprozess) -----
 		if len(os.Args) > 1 && os.Args[1] == "--scanpdf" {
@@ -164,7 +165,7 @@ PERSON_LOOP:
 			ctx, cancel := context.WithTimeout(context.Background(), 12*time.Second)
 			defer cancel()
 
-			email, score, err := ExtractEmailsFromPDFCtx(ctx, pdfPath, person)
+			email, score, err := Klassische_Pipeline.ExtractEmailsFromPDFCtx(ctx, pdfPath, person)
 			if err != nil || email == "" {
 				fmt.Println("NONE")
 				return
@@ -191,7 +192,7 @@ PERSON_LOOP:
 			}
 			tmp.Close()
 			defer os.Remove(tmp.Name())
-			if derr := DownloadPDF(pdfURL, tmp.Name()); derr != nil {
+			if derr := Klassische_Pipeline.DownloadPDF(pdfURL, tmp.Name()); derr != nil {
 				continue
 			}
 			start := time.Now()
@@ -237,7 +238,7 @@ PERSON_LOOP:
 
 	// Ausgabe schreiben
 	output := fmt.Sprintf("results_%d.csv", time.Now().Unix())
-	if err := WriteCSV(output, results); err != nil {
+	if err := Klassische_Pipeline.WriteCSV(output, results); err != nil {
 		fmt.Printf("Fehler beim Schreiben der Ergebnisse: %v\n", err)
 	} else {
 		fmt.Printf("\n💾 Ergebnisse gespeichert in: %s  (Treffer: %d/%d)  ⏱️ Gesamt: %.2fs\n",
@@ -286,7 +287,7 @@ func scanPDFInSubprocess(ctx context.Context, path, person string) (string, int,
 
 // --------------------------- Query-Helfer -----------------------
 
-func buildQuery(p PersonEntry) string {
+func buildQuery(p Klassische_Pipeline.PersonEntry) string {
 	name := strings.TrimSpace(p.Name)
 	inst := strings.TrimSpace(p.Institution)
 	q := strings.TrimSpace(strings.Join([]string{name, inst}, " "))
@@ -406,7 +407,7 @@ func addResultOnce(results *[]ResultRow, row ResultRow) {
 func processLinksCollyEarly(links []string, contactQuery string, candidates map[string]*candInfo) (finalized bool, email, source string) {
 	for _, link := range links {
 		start := time.Now()
-		em, score, err := ExtractEmailWithColly(link, contactQuery)
+		em, score, err := Klassische_Pipeline.ExtractEmailWithColly(link, contactQuery)
 		fmt.Printf("⏱️ [Colly] %s: %.2fs\n", contactQuery, time.Since(start).Seconds())
 		if err != nil || em == "" {
 			continue
@@ -422,7 +423,7 @@ func processLinksCollyEarly(links []string, contactQuery string, candidates map[
 func processLinksChromedpEarly(links []string, contactQuery string, candidates map[string]*candInfo) (finalized bool, email, source string) {
 	for _, link := range links {
 		start := time.Now()
-		em, score, err := ExtractEmailFromURL(link, contactQuery)
+		em, score, err := Klassische_Pipeline.ExtractEmailFromURL(link, contactQuery)
 		fmt.Printf("⏱️ [Chromedp] %s: %.2fs\n", contactQuery, time.Since(start).Seconds())
 		if err != nil || em == "" {
 			continue
