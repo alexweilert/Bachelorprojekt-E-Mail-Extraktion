@@ -1,0 +1,12 @@
+aiagent/node_modules/
+aiagent/chromedriver-win64
+aiagent/test-results/
+aiagent/playwright-report/
+aiagent/blob-report/
+aiagent/playwright/.cache/
+aiagent/tests-examples
+aiagent/.env
+Old_Data
+tests-examples
+tests
+.idea
