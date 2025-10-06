@@ -1,5 +1,0 @@
-setup.py
-bachelorprojekt.egg-info/PKG-INFO
-bachelorprojekt.egg-info/SOURCES.txt
-bachelorprojekt.egg-info/dependency_links.txt
-bachelorprojekt.egg-info/top_level.txt
