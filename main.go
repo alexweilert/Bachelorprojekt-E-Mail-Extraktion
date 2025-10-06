@@ -1,11 +1,17 @@
 package main
 
 import (
+	"bytes"
+	"context"
 	"fmt"
+	"io"
 	"math/rand"
 	"net/url"
 	"os"
+	"os/exec"
 	"regexp"
+	"runtime/debug"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -15,7 +21,7 @@ import (
 const (
 	maxLinksPhase1   = 10
 	maxLinksFallback = 10
-	maxLinksPDF      = 10
+	maxLinksPDF      = 6 // weniger PDFs pro Person → stabiler
 
 	hardAcceptScore   = 14 // sehr sicher -> sofort final
 	consensusMinScore = 6  // Konsens braucht mind. diesen Score
@@ -58,12 +64,15 @@ func main() {
 	results := make([]ResultRow, 0, len(entries))
 	foundCount := 0
 	startAll := time.Now()
+	rand.Seed(time.Now().UnixNano())
 
 PERSON_LOOP:
 	for i, entry := range entries {
+		// kleine Höflichkeitspause zwischen Personen
 		if i > 0 {
-			time.Sleep(time.Duration(3000+rand.Intn(3000)) * time.Millisecond)
+			time.Sleep(time.Duration(1500+rand.Intn(2000)) * time.Millisecond)
 		}
+
 		contactQuery := buildQuery(entry)
 		if contactQuery == "" {
 			continue
@@ -77,70 +86,93 @@ PERSON_LOOP:
 		candidates := map[string]*candInfo{}
 
 		// ----------------- Phase 1: DDG → Colly → Chromedp -----------------
-		/*
-			phase1Links, err := DuckDuckGoSearch(contactQuery)
-			if err != nil {
-				fmt.Printf("⚠️ DuckDuckGo fehlgeschlagen: %v\n", err)
-				phase1Links = nil
-			}
-			fmt.Printf("🔎 Phase1: %d Links\n", len(phase1Links))
+		phase1Links, err := DuckDuckGoSearch(contactQuery)
+		if err != nil {
+			fmt.Printf("⚠️ DuckDuckGo fehlgeschlagen: %v\n", err)
+			phase1Links = nil
+		}
+		fmt.Printf("🔎 Phase1: %d Links\n", len(phase1Links))
 
-			if len(phase1Links) > maxLinksPhase1 {
-				phase1Links = phase1Links[:maxLinksPhase1]
-			}
+		if len(phase1Links) > maxLinksPhase1 {
+			phase1Links = phase1Links[:maxLinksPhase1]
+		}
 
-				// Colly mit Early-Accept
-				if finalized, email, src := processLinksCollyEarly(phase1Links, contactQuery, candidates); finalized {
-					row.Email, row.Source = email, src
-					addResultOnce(&results, row)
-					foundCount++
-					fmt.Printf("✅ Found (early): %s => %s\n", contactQuery, row.Email)
-					continue PERSON_LOOP
-				}
+		// Colly mit Early-Accept
+		if finalized, email, src := processLinksCollyEarly(phase1Links, contactQuery, candidates); finalized {
+			row.Email, row.Source = email, src
+			addResultOnce(&results, row)
+			foundCount++
+			fmt.Printf("✅ Found (early): %s => %s\n", contactQuery, row.Email)
+			continue PERSON_LOOP
+		}
 
+		// Chromedp mit Early-Accept
+		if finalized, email, src := processLinksChromedpEarly(phase1Links, contactQuery, candidates); finalized {
+			row.Email, row.Source = email, src
+			addResultOnce(&results, row)
+			foundCount++
+			fmt.Printf("✅ Found (early): %s => %s\n", contactQuery, row.Email)
+			continue PERSON_LOOP
+		}
 
-				// Chromedp mit Early-Accept
-				if finalized, email, src := processLinksChromedpEarly(phase1Links, contactQuery, candidates); finalized {
-					row.Email, row.Source = email, src
-					addResultOnce(&results, row)
-					foundCount++
-					fmt.Printf("✅ Found (early): %s => %s\n", contactQuery, row.Email)
-					continue PERSON_LOOP
-				}
+		// ----------------- Fallback: „email address“ -----------------------
+		fallbackQuery := contactQuery + " email address"
+		fallbackLinks, ferr := DuckDuckGoSearch(fallbackQuery)
+		if ferr != nil {
+			fmt.Printf("⚠️ DuckDuckGo Fallback fehlgeschlagen: %v\n", ferr)
+			fallbackLinks = nil
+		}
+		fmt.Printf("🔎 Fallback: %d Links\n", len(fallbackLinks))
+		if len(fallbackLinks) > maxLinksFallback {
+			fallbackLinks = fallbackLinks[:maxLinksFallback]
+		}
 
-				// ----------------- Fallback: „email address“ -----------------------
-				fallbackQuery := contactQuery + " email address"
-				fallbackLinks, ferr := DuckDuckGoSearch(fallbackQuery)
-				if ferr != nil {
-					fmt.Printf("⚠️ DuckDuckGo Fallback fehlgeschlagen: %v\n", ferr)
-					fallbackLinks = nil
-				}
-				fmt.Printf("🔎 Fallback: %d Links\n", len(fallbackLinks))
-				if len(fallbackLinks) > maxLinksFallback {
-					fallbackLinks = fallbackLinks[:maxLinksFallback]
-				}
+		// Colly mit Early-Accept
+		if finalized, email, src := processLinksCollyEarly(fallbackLinks, contactQuery, candidates); finalized {
+			row.Email, row.Source = email, src
+			addResultOnce(&results, row)
+			foundCount++
+			fmt.Printf("✅ Found (early): %s => %s\n", contactQuery, row.Email)
+			continue PERSON_LOOP
+		}
 
-				// Colly mit Early-Accept
-				if finalized, email, src := processLinksCollyEarly(fallbackLinks, contactQuery, candidates); finalized {
-					row.Email, row.Source = email, src
-					addResultOnce(&results, row)
-					foundCount++
-					fmt.Printf("✅ Found (early): %s => %s\n", contactQuery, row.Email)
-					continue PERSON_LOOP
-				}
+		// Chromedp mit Early-Accept
+		if finalized, email, src := processLinksChromedpEarly(fallbackLinks, contactQuery, candidates); finalized {
+			row.Email, row.Source = email, src
+			addResultOnce(&results, row)
+			foundCount++
+			fmt.Printf("✅ Found (early): %s => %s\n", contactQuery, row.Email)
+			continue PERSON_LOOP
+		}
 
-				// Chromedp mit Early-Accept
-				if finalized, email, src := processLinksChromedpEarly(fallbackLinks, contactQuery, candidates); finalized {
-					row.Email, row.Source = email, src
-					addResultOnce(&results, row)
-					foundCount++
-					fmt.Printf("✅ Found (early): %s => %s\n", contactQuery, row.Email)
-					continue PERSON_LOOP
-				}
-		*/
 		// ----------------- Phase 2: PDFs -----------------------------------
 		pdfQuery := contactQuery + " filetype:pdf"
 		pdfLinks, perr := DuckDuckGoPDFSearch(pdfQuery)
+
+		// ----- Worker-Mode für sichere PDF-Analyse (Subprozess) -----
+		if len(os.Args) > 1 && os.Args[1] == "--scanpdf" {
+			// Erwartet: --scanpdf <pdfPath> <person>
+			if len(os.Args) < 4 {
+				fmt.Println("NONE")
+				return
+			}
+			// Hartes Heap-Limit nur für den Worker (z. B. 200 MiB)
+			debug.SetMemoryLimit(200 << 20)
+			pdfPath := os.Args[2]
+			person := os.Args[3]
+
+			ctx, cancel := context.WithTimeout(context.Background(), 12*time.Second)
+			defer cancel()
+
+			email, score, err := ExtractEmailsFromPDFCtx(ctx, pdfPath, person)
+			if err != nil || email == "" {
+				fmt.Println("NONE")
+				return
+			}
+			fmt.Printf("OK|%s|%d\n", email, score)
+			return
+		}
+
 		if perr != nil {
 			fmt.Printf("⚠️ DuckDuckGo (PDF) Fehler: %v\n", perr)
 			pdfLinks = nil
@@ -151,24 +183,32 @@ PERSON_LOOP:
 		}
 
 		for _, pdfURL := range pdfLinks {
-			time.Sleep(time.Duration(3000+rand.Intn(900)) * time.Millisecond)
+			// leichte Pause zwischen PDFs, um Blockaden zu vermeiden
+			time.Sleep(time.Duration(3000+rand.Intn(1500)) * time.Millisecond)
 			tmp, terr := os.CreateTemp("", "emailpdf_*.pdf")
 			if terr != nil {
 				continue
 			}
 			tmp.Close()
 			defer os.Remove(tmp.Name())
-
 			if derr := DownloadPDF(pdfURL, tmp.Name()); derr != nil {
 				continue
 			}
-
 			start := time.Now()
-			email, score, err := ExtractEmailsFromPDF(tmp.Name(), contactQuery)
+			// Subprozess mit hartem Timeout pro PDF
+			ctxPDF, cancelPDF := context.WithTimeout(context.Background(), 12*time.Second)
+			email, score, werr := scanPDFInSubprocess(ctxPDF, tmp.Name(), contactQuery)
+			cancelPDF()
 			fmt.Printf("⏱️ [PDF fast] %s: %.2fs\n", contactQuery, time.Since(start).Seconds())
-			if err != nil || email == "" {
+			if werr != nil {
+				// Worker-Timeout/Crash → einfach nächste PDF
+				fmt.Printf("⏭️ Skip PDF (worker err: %v)\n", werr)
 				continue
 			}
+			if email == "" {
+				continue
+			}
+
 			registerCandidate(candidates, email, score, pdfURL)
 			// Early-Accept in PDF-Phase
 			if shouldEarlyAccept(candidates, email, score) {
@@ -203,6 +243,45 @@ PERSON_LOOP:
 		fmt.Printf("\n💾 Ergebnisse gespeichert in: %s  (Treffer: %d/%d)  ⏱️ Gesamt: %.2fs\n",
 			output, foundCount, len(entries), time.Since(startAll).Seconds())
 	}
+}
+
+// --------------------- Subprozess-Wrapper -----------------------
+
+func scanPDFInSubprocess(ctx context.Context, path, person string) (string, int, error) {
+	exe, err := os.Executable()
+	if err != nil {
+		return "", 0, err
+	}
+	cmd := exec.CommandContext(ctx, exe, "--scanpdf", path, person)
+
+	// Hartes Heap-Limit im Child via Env (Go 1.19+)
+	cmd.Env = append(os.Environ(), "GOMEMLIMIT=200MiB")
+
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = io.Discard // PDF-Lib Debug-Noise ignorieren
+
+	if err := cmd.Run(); err != nil {
+		// Timeout / Crash → als Fehler zurück; Aufrufer macht einfach weiter
+		return "", 0, err
+	}
+
+	// Robustes Parsing (letzte OK| Zeile suchen; Debug-Zeilen ignorieren)
+	lines := strings.Split(strings.TrimSpace(out.String()), "\n")
+	for i := len(lines) - 1; i >= 0; i-- {
+		line := strings.TrimSpace(lines[i])
+		if line == "NONE" || line == "" {
+			return "", 0, nil
+		}
+		if strings.HasPrefix(line, "OK|") {
+			parts := strings.Split(line, "|")
+			if len(parts) >= 3 {
+				sc, _ := strconv.Atoi(parts[2])
+				return parts[1], sc, nil
+			}
+		}
+	}
+	return "", 0, nil
 }
 
 // --------------------------- Query-Helfer -----------------------
@@ -255,44 +334,8 @@ func sanitizeQuery(q string) string {
 	return strings.Join(strings.Fields(out), " ")
 }
 
-/*
-// --------------------- Link-Verarbeitung (+ Early) ---------------
-func processLinksCollyEarly(links []string, contactQuery string, candidates map[string]*candInfo) (finalized bool, email, source string) {
-	for _, link := range links {
-		start := time.Now()
-		em, score, err := ExtractEmailWithColly(link, contactQuery)
-		fmt.Printf("⏱️ [Colly] %s: %.2fs\n", contactQuery, time.Since(start).Seconds())
-		if err != nil || em == "" {
-			continue
-		}
-		registerCandidate(candidates, em, score, link)
-		if shouldEarlyAccept(candidates, em, score) {
-			return true, em, link
-		}
-	}
-	return false, "", ""
-}
+// ----------------- Kandidaten / Finale Auswahl ------------------
 
-
-func processLinksChromedpEarly(links []string, contactQuery string, candidates map[string]*candInfo) (finalized bool, email, source string) {
-	for _, link := range links {
-		start := time.Now()
-		em, score, err := ExtractEmailFromURL(link, contactQuery)
-		fmt.Printf("⏱️ [Chromedp] %s: %.2fs\n", contactQuery, time.Since(start).Seconds())
-		if err != nil || em == "" {
-			continue
-		}
-		registerCandidate(candidates, em, score, link)
-		if shouldEarlyAccept(candidates, em, score) {
-			return true, em, link
-		}
-	}
-	return false, "", ""
-}
-
-*/
-
-// **Early-Accept Regel**: harter Score ODER Konsens erfüllt.
 func shouldEarlyAccept(cands map[string]*candInfo, email string, score int) bool {
 	if score >= hardAcceptScore {
 		return true
@@ -303,8 +346,6 @@ func shouldEarlyAccept(cands map[string]*candInfo, email string, score int) bool
 	}
 	return false
 }
-
-// ----------------- Kandidaten / Finale Auswahl ------------------
 
 func registerCandidate(cands map[string]*candInfo, email string, score int, src string) {
 	if email == "" {
@@ -320,7 +361,6 @@ func registerCandidate(cands map[string]*candInfo, email string, score int, src 
 	info.sources[sourceKey(src)] = struct{}{}
 }
 
-// Finale Entscheidung, wenn kein Early-Accept erfolgte
 func pickFinal(cands map[string]*candInfo, minScore int) (email, source string) {
 	// 1) Konsens bevorzugen
 	for em, info := range cands {
@@ -363,4 +403,34 @@ func addResultOnce(results *[]ResultRow, row ResultRow) {
 	*results = append(*results, row)
 }
 
-func init() { rand.Seed(time.Now().UnixNano()) }
+func processLinksCollyEarly(links []string, contactQuery string, candidates map[string]*candInfo) (finalized bool, email, source string) {
+	for _, link := range links {
+		start := time.Now()
+		em, score, err := ExtractEmailWithColly(link, contactQuery)
+		fmt.Printf("⏱️ [Colly] %s: %.2fs\n", contactQuery, time.Since(start).Seconds())
+		if err != nil || em == "" {
+			continue
+		}
+		registerCandidate(candidates, em, score, link)
+		if shouldEarlyAccept(candidates, em, score) {
+			return true, em, link
+		}
+	}
+	return false, "", ""
+}
+
+func processLinksChromedpEarly(links []string, contactQuery string, candidates map[string]*candInfo) (finalized bool, email, source string) {
+	for _, link := range links {
+		start := time.Now()
+		em, score, err := ExtractEmailFromURL(link, contactQuery)
+		fmt.Printf("⏱️ [Chromedp] %s: %.2fs\n", contactQuery, time.Since(start).Seconds())
+		if err != nil || em == "" {
+			continue
+		}
+		registerCandidate(candidates, em, score, link)
+		if shouldEarlyAccept(candidates, em, score) {
+			return true, em, link
+		}
+	}
+	return false, "", ""
+}

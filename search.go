@@ -54,18 +54,18 @@ func DuckDuckGoSearch(query string) ([]string, error) {
 	return duckDuckGoSearch(query, opts)
 }
 
-// Ersetze die bestehende DuckDuckGoPDFSearch durch diese Version:
+// DuckDuckGoPDFSearch baut "höfliche" Defaults und ruft deine bestehende duckDuckGoSearch(query, opts)
 func DuckDuckGoPDFSearch(query string) ([]string, error) {
 	opts := defaultDDGOptions()
 	opts.PDFOnly = true
-	opts.Limit = 6 // weniger PDFs laden → weniger Zeitouts
+	opts.Limit = 6 // passend zu main.maxLinksPDF
 	opts.MaxPages = 2
-	opts.VerifyLinks = false
+	opts.VerifyLinks = false // keine parallelen HEAD-Checks
 	opts.Workers = 1
 	opts.MinDelay = 1500 * time.Millisecond
 	opts.MaxDelay = 3500 * time.Millisecond
-	opts.Timeout = 60 * time.Second    // statt 25s: Gesamtbudget der Suche
-	opts.ReqTimeout = 12 * time.Second // pro Request leicht erhöht
+	opts.Timeout = 60 * time.Second    // Gesamtbudget
+	opts.ReqTimeout = 12 * time.Second // pro Request
 	return duckDuckGoSearch(query, opts)
 }
 

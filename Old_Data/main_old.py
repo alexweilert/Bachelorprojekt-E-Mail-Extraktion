@@ -23,7 +23,7 @@ load_dotenv()
 client = OpenAI()
 INPUT_CSV = "list_of_names_and_affiliations.csv"
 OUTPUT_CSV = "emails_ai_agent.csv"
-CHROMEDRIVER_PATH = "chromedriver-win64/chromedriver.exe"
+CHROMEDRIVER_PATH = "../aiagent/chromedriver-win64/chromedriver.exe"
 MEMORY_PATH = "email_memory_index"
 
 embedding_model = OpenAIEmbeddings()

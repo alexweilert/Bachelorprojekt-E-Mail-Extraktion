@@ -1,33 +1,290 @@
 {
-  "Boston University": {
-    "domains": [
-      "bu.edu",
-      "network.expertisefinder.com",
-      "tcr-us.com"
-    ],
-    "directory_hints": []
-  },
   "University of California Irvine": {
     "domains": [
-      "ucits.org"
+      "engineering.uci.edu"
     ],
     "directory_hints": []
   },
   "University of Stuttgart": {
     "domains": [
-      "tc.ifac-control.org"
+      "ieeecss.org"
+    ],
+    "directory_hints": []
+  },
+  "Boston University": {
+    "domains": [
+      "bu.edu"
+    ],
+    "directory_hints": []
+  },
+  "University of North Carolina at Chapel Hill": {
+    "domains": [
+      "engineering.washu.edu"
     ],
     "directory_hints": []
   },
   "University of Connecticut": {
     "domains": [
-      "contactout.com"
+      "chemical-biomolecular.engineering.uconn.edu",
+      "engineering.uconn.edu",
+      "computing.engineering.uconn.edu"
     ],
     "directory_hints": []
   },
   "UTRC": {
     "domains": [
       "cvpr2011.thecvf.com"
+    ],
+    "directory_hints": []
+  },
+  "Queensland University of Technology": {
+    "domains": [
+      "ku.ac.ae"
+    ],
+    "directory_hints": []
+  },
+  "University of Waterloo": {
+    "domains": [
+      "uwaterloo.ca"
+    ],
+    "directory_hints": []
+  },
+  "University of Rome La Sapienza": {
+    "domains": [
+      "lucadenardis.site.uniroma1.it"
+    ],
+    "directory_hints": []
+  },
+  "SafeRiver": {
+    "domains": [
+      "serma-safety-security.com"
+    ],
+    "directory_hints": []
+  },
+  "Superiore Sant'Anna": {
+    "domains": [
+      "retis.sssup.it"
+    ],
+    "directory_hints": []
+  },
+  "Institute of Technology": {
+    "domains": [
+      "ece.gatech.edu"
+    ],
+    "directory_hints": []
+  },
+  "University of Toronto": {
+    "domains": [
+      "mechatronics.aerospace.utoronto.ca",
+      "mie.utoronto.ca"
+    ],
+    "directory_hints": []
+  },
+  "Clemson University": {
+    "domains": [
+      "clemson.edu"
+    ],
+    "directory_hints": []
+  },
+  "Tufts University": {
+    "domains": [
+      "engineering.tufts.edu",
+      "eecs.tufts.edu"
+    ],
+    "directory_hints": []
+  },
+  "Technical University of Munich": {
+    "domains": [
+      "fsd.ed.tum.de"
+    ],
+    "directory_hints": []
+  },
+  "National Chiao-Tung University": {
+    "domains": [
+      "dee.nycu.edu.tw"
+    ],
+    "directory_hints": []
+  },
+  "CEA Tech": {
+    "domains": [
+      "mpsoc-forum.org"
+    ],
+    "directory_hints": []
+  },
+  "University of Pennsylvania": {
+    "domains": [
+      "nowpublishers.com",
+      "cpsl.pratt.duke.edu"
+    ],
+    "directory_hints": []
+  },
+  "University of Illinois at Urbana-Champaign": {
+    "domains": [
+      "mitras.ece.illinois.edu"
+    ],
+    "directory_hints": []
+  },
+  "University of Salzburg": {
+    "domains": [
+      "eudl.eu"
+    ],
+    "directory_hints": []
+  },
+  "Draper Laboratory": {
+    "domains": [
+      "kronika.ac"
+    ],
+    "directory_hints": []
+  },
+  "Ecole Polytechnique de Montreal": {
+    "domains": [
+      "polymtl.ca"
+    ],
+    "directory_hints": []
+  },
+  "McMaster University": {
+    "domains": [
+      "eng.mcmaster.ca",
+      "cas.mcmaster.ca"
+    ],
+    "directory_hints": []
+  },
+  "Northeastern University": {
+    "domains": [
+      "coe.northeastern.edu",
+      "khoury.northeastern.edu"
+    ],
+    "directory_hints": []
+  },
+  "Linköping University": {
+    "domains": [
+      "liu.se"
+    ],
+    "directory_hints": []
+  },
+  "Technical University of Denmark": {
+    "domains": [
+      "dtu.dk"
+    ],
+    "directory_hints": []
+  },
+  "Western New England University": {
+    "domains": [
+      "wne.edu"
+    ],
+    "directory_hints": []
+  },
+  "SoftMEMS LLC": {
+    "domains": [
+      "cci.charlotte.edu"
+    ],
+    "directory_hints": []
+  },
+  "CNRS-VERIMAG University of Grenoble": {
+    "domains": [
+      "scholar.google.com"
+    ],
+    "directory_hints": []
+  },
+  "University of Oxford": {
+    "domains": [
+      "scholar.google.com"
+    ],
+    "directory_hints": []
+  },
+  "University of California Riverside": {
+    "domains": [
+      "intra.ece.ucr.edu"
+    ],
+    "directory_hints": []
+  },
+  "Iowa State University": {
+    "domains": [
+      "engineering.iastate.edu"
+    ],
+    "directory_hints": []
+  },
+  "Ford Motor Co": {
+    "domains": [
+      "contactout.com"
+    ],
+    "directory_hints": []
+  },
+  "Ulm University": {
+    "domains": [
+      "uni-ulm.de"
+    ],
+    "directory_hints": []
+  },
+  "The University of Texas at Dallas": {
+    "domains": [
+      "syse.utdallas.edu"
+    ],
+    "directory_hints": []
+  },
+  "University of Louisiana at Lafayette": {
+    "domains": [
+      "experts.louisiana.edu"
+    ],
+    "directory_hints": []
+  },
+  "Massachusetts Institute of Technology": {
+    "domains": [
+      "mit.edu"
+    ],
+    "directory_hints": []
+  },
+  "ASML": {
+    "domains": [
+      "mie.njit.edu"
+    ],
+    "directory_hints": []
+  },
+  "University of Antwerp/McGill University": {
+    "domains": [
+      "network.expertisefinder.com"
+    ],
+    "directory_hints": []
+  },
+  "Budapest University of Tech. and Economics": {
+    "domains": [
+      "liu.se"
+    ],
+    "directory_hints": []
+  },
+  "University of North Texas": {
+    "domains": [
+      "uta.edu"
+    ],
+    "directory_hints": []
+  },
+  "Auckland University of Technology": {
+    "domains": [
+      "stemtec.aut.ac.nz"
+    ],
+    "directory_hints": []
+  },
+  "Worcester Polytechnic Institute": {
+    "domains": [
+      "wpi.edu"
+    ],
+    "directory_hints": []
+  },
+  "Harvard Medical School": {
+    "domains": [
+      "hms.harvard.edu"
+    ],
+    "directory_hints": []
+  },
+  "Worcester Polytechnic Institute/MathWorks0": {
+    "domains": [
+      "sites.google.com"
+    ],
+    "directory_hints": []
+  },
+  "wassyng@mcmaster.ca": {
+    "domains": [
+      "cas.mcmaster.ca"
     ],
     "directory_hints": []
   }

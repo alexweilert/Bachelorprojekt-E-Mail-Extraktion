@@ -1,21 +1,4 @@
 {
-  "bu.edu": {
-    "patterns": [],
-    "examples": [
-      {
-        "name": "Christos Cassandras",
-        "email": "cgc@bu.edu"
-      },
-      {
-        "name": "John Baillieul",
-        "email": "johnb@bu.edu"
-      },
-      {
-        "name": "Michael Caramanis",
-        "email": "mcaraman@bu.edu"
-      }
-    ]
-  },
   "uci.edu": {
     "patterns": [],
     "examples": [
@@ -34,6 +17,34 @@
       }
     ]
   },
+  "bu.edu": {
+    "patterns": [],
+    "examples": [
+      {
+        "name": "John Baillieul",
+        "email": "johnb@bu.edu"
+      },
+      {
+        "name": "Michael Caramanis",
+        "email": "mcaraman@bu.edu"
+      },
+      {
+        "name": "Christos Cassandras",
+        "email": "cgc@bu.edu"
+      }
+    ]
+  },
+  "wustl.edu": {
+    "patterns": [
+      "contains_last"
+    ],
+    "examples": [
+      {
+        "name": "Sanjoy Baruah",
+        "email": "baruah@wustl.edu"
+      }
+    ]
+  },
   "uconn.edu": {
     "patterns": [
       "first.last"
@@ -42,6 +53,14 @@
       {
         "name": "George Bollas",
         "email": "george.bollas@uconn.edu"
+      },
+      {
+        "name": "Laurent Michel",
+        "email": "laurent.michel@uconn.edu"
+      },
+      {
+        "name": "Krishna R. Pattipati",
+        "email": "krishna.pattipati@uconn.edu"
       }
     ]
   },
@@ -53,6 +72,472 @@
       {
         "name": "Isaac Cohen",
         "email": "isaac.cohen@utrc.utc.com"
+      }
+    ]
+  },
+  "qut.edu.au": {
+    "patterns": [
+      "first.last"
+    ],
+    "examples": [
+      {
+        "name": "Peter Corke",
+        "email": "peter.corke@qut.edu.au"
+      }
+    ]
+  },
+  "uwaterloo.ca": {
+    "patterns": [
+      "first.last"
+    ],
+    "examples": [
+      {
+        "name": "Krzysztof Czarnecki",
+        "email": "krzysztof.czarnecki@uwaterloo.ca"
+      }
+    ]
+  },
+  "uniroma1.it": {
+    "patterns": [
+      "contains_last_and_fi"
+    ],
+    "examples": [
+      {
+        "name": "Luca De Nardis",
+        "email": "luca.denardis@uniroma1.it"
+      }
+    ]
+  },
+  "serma.com": {
+    "patterns": [],
+    "examples": [
+      {
+        "name": "Veronique Delebarre",
+        "email": "presse@serma.com"
+      }
+    ]
+  },
+  "sssup.it": {
+    "patterns": [],
+    "examples": [
+      {
+        "name": "Marco Di Natale Scuola",
+        "email": "marco@sssup.it"
+      }
+    ]
+  },
+  "ece.gatech.edu": {
+    "patterns": [],
+    "examples": [
+      {
+        "name": "Magnus Egerstedt Georgia",
+        "email": "magnus.egerstedt@ece.gatech.edu"
+      }
+    ]
+  },
+  "utoronto.ca": {
+    "patterns": [
+      "first.last"
+    ],
+    "examples": [
+      {
+        "name": "Reza Emami",
+        "email": "reza.emami@utoronto.ca"
+      }
+    ]
+  },
+  "clemson.edu": {
+    "patterns": [
+      "flast"
+    ],
+    "examples": [
+      {
+        "name": "Zoran Filipi",
+        "email": "zfilipi@clemson.edu"
+      }
+    ]
+  },
+  "tufts.edu": {
+    "patterns": [
+      "first.last"
+    ],
+    "examples": [
+      {
+        "name": "Soha Hassoun",
+        "email": "soha.hassoun@tufts.edu"
+      }
+    ]
+  },
+  "tum.de": {
+    "patterns": [
+      "first.last"
+    ],
+    "examples": [
+      {
+        "name": "Florian Holzapfel",
+        "email": "florian.holzapfel@tum.de"
+      }
+    ]
+  },
+  "cc.nctu.edu.tw": {
+    "patterns": [
+      "contains_last_and_fi"
+    ],
+    "examples": [
+      {
+        "name": "Pau-Lo Hsu",
+        "email": "plhsu@cc.nctu.edu.tw"
+      }
+    ]
+  },
+  "cea.fr": {
+    "patterns": [
+      "first.last"
+    ],
+    "examples": [
+      {
+        "name": "Ahmed Jerraya",
+        "email": "ahmed.jerraya@cea.fr"
+      }
+    ]
+  },
+  "seas.upenn.edu": {
+    "patterns": [],
+    "examples": [
+      {
+        "name": "Zhihao Jiang",
+        "email": "zhihaoj@seas.upenn.edu"
+      }
+    ]
+  },
+  "ece.tufts.edu": {
+    "patterns": [
+      "contains_last"
+    ],
+    "examples": [
+      {
+        "name": "Usman Khan",
+        "email": "khan@ece.tufts.edu"
+      }
+    ]
+  },
+  "mie.utoronto.ca": {
+    "patterns": [
+      "contains_last"
+    ],
+    "examples": [
+      {
+        "name": "Hugh T. Liu",
+        "email": "xyliu@mie.utoronto.ca"
+      }
+    ]
+  },
+  "illinois.edu": {
+    "patterns": [
+      "contains_last_and_fi"
+    ],
+    "examples": [
+      {
+        "name": "Sayan Mitra",
+        "email": "mitras@illinois.edu"
+      }
+    ]
+  },
+  "cs.uni-salzburg.at": {
+    "patterns": [
+      "first.last"
+    ],
+    "examples": [
+      {
+        "name": "Andreas Naderlinger",
+        "email": "andreas.naderlinger@cs.uni-salzburg.at"
+      }
+    ]
+  },
+  "kronika.ac": {
+    "patterns": [],
+    "examples": [
+      {
+        "name": "Sam Nazari",
+        "email": "editor@kronika.ac"
+      }
+    ]
+  },
+  "polymtl.ca": {
+    "patterns": [
+      "first.last"
+    ],
+    "examples": [
+      {
+        "name": "Gabriela Nicolescu",
+        "email": "gabriela.nicolescu@polymtl.ca"
+      }
+    ]
+  },
+  "mcmaster.ca": {
+    "patterns": [
+      "contains_last",
+      "contains_last_and_fi"
+    ],
+    "examples": [
+      {
+        "name": "Mark Lawford",
+        "email": "lawford@mcmaster.ca"
+      },
+      {
+        "name": "Alan Wassyng",
+        "email": "wassyng@mcmaster.ca"
+      },
+      {
+        "name": "Alan Wassyng McMaster University",
+        "email": "wassyng@mcmaster.ca"
+      }
+    ]
+  },
+  "northeastern.edu": {
+    "patterns": [
+      "f.last"
+    ],
+    "examples": [
+      {
+        "name": "Miriam Leeser",
+        "email": "m.leeser@northeastern.edu"
+      },
+      {
+        "name": "Gunar Schirner",
+        "email": "G.Schirner@northeastern.edu"
+      }
+    ]
+  },
+  "liu.se": {
+    "patterns": [
+      "first.last"
+    ],
+    "examples": [
+      {
+        "name": "Lennart Ljung",
+        "email": "lennart.ljung@liu.se"
+      },
+      {
+        "name": "Daniel Varro",
+        "email": "daniel.varro@liu.se"
+      }
+    ]
+  },
+  "dtu.dk": {
+    "patterns": [],
+    "examples": [
+      {
+        "name": "Jan Madsen",
+        "email": "jama@dtu.dk"
+      }
+    ]
+  },
+  "wne.edu": {
+    "patterns": [
+      "first.last"
+    ],
+    "examples": [
+      {
+        "name": "Neeraj Magotra",
+        "email": "neeraj.magotra@wne.edu"
+      }
+    ]
+  },
+  "charlotte.edu": {
+    "patterns": [
+      "f.last"
+    ],
+    "examples": [
+      {
+        "name": "Mary Ann Maher",
+        "email": "m.maher@charlotte.edu"
+      }
+    ]
+  },
+  "imag.fr": {
+    "patterns": [],
+    "examples": [
+      {
+        "name": "Oded Maler",
+        "email": "email@imag.fr"
+      }
+    ]
+  },
+  "ccs.neu.edu": {
+    "patterns": [],
+    "examples": [
+      {
+        "name": "Pete Manolios",
+        "email": "pete@ccs.neu.edu"
+      }
+    ]
+  },
+  "nquiringminds.com": {
+    "patterns": [],
+    "examples": [
+      {
+        "name": "Alexandru Mereacre",
+        "email": "email@nquiringminds.com"
+      }
+    ]
+  },
+  "ecedotucr.edu": {
+    "patterns": [
+      "flast"
+    ],
+    "examples": [
+      {
+        "name": "Qi Zhu",
+        "email": "qzhu@ecedotucr.edu"
+      }
+    ]
+  },
+  "iastate.edu": {
+    "patterns": [
+      "flast"
+    ],
+    "examples": [
+      {
+        "name": "Ratnesh Kumar",
+        "email": "rkumar@iastate.edu"
+      }
+    ]
+  },
+  "ford.com": {
+    "patterns": [
+      "flast"
+    ],
+    "examples": [
+      {
+        "name": "William Milam",
+        "email": "wmilam@ford.com"
+      }
+    ]
+  },
+  "uni-ulm.de": {
+    "patterns": [
+      "contains_last"
+    ],
+    "examples": [
+      {
+        "name": "Frank Slomka",
+        "email": "slomka@uni-ulm.de"
+      }
+    ]
+  },
+  "utdallas.edu": {
+    "patterns": [
+      "flast"
+    ],
+    "examples": [
+      {
+        "name": "Mark Spong",
+        "email": "mspong@utdallas.edu"
+      }
+    ]
+  },
+  "louisiana.edu": {
+    "patterns": [
+      "flast"
+    ],
+    "examples": [
+      {
+        "name": "Charles Taylor",
+        "email": "ctaylor@louisiana.edu"
+      }
+    ]
+  },
+  "mit.edu": {
+    "patterns": [],
+    "examples": [
+      {
+        "name": "Russ Tedrake",
+        "email": "russt@mit.edu"
+      }
+    ]
+  },
+  "asml.com": {
+    "patterns": [
+      "first.last"
+    ],
+    "examples": [
+      {
+        "name": "Ozer Unluhisarcikli",
+        "email": "ozer.unluhisarcikli@asml.com"
+      }
+    ]
+  },
+  "cs.mcgill.ca": {
+    "patterns": [],
+    "examples": [
+      {
+        "name": "Hans Vangheluwe",
+        "email": "hv@cs.mcgill.ca"
+      }
+    ]
+  },
+  "uta.edu": {
+    "patterns": [
+      "first.last"
+    ],
+    "examples": [
+      {
+        "name": "Yan Wan",
+        "email": "yan.wan@uta.edu"
+      }
+    ]
+  },
+  "aut.ac.nz": {
+    "patterns": [
+      "contains_last_and_fi"
+    ],
+    "examples": [
+      {
+        "name": "David Wilson",
+        "email": "diwilson@aut.ac.nz"
+      }
+    ]
+  },
+  "wpi.edu": {
+    "patterns": [],
+    "examples": [
+      {
+        "name": "Alexander M. Wylginski",
+        "email": "alexw@wpi.edu"
+      }
+    ]
+  },
+  "hms.harvard.edu": {
+    "patterns": [
+      "contains_last_and_fi"
+    ],
+    "examples": [
+      {
+        "name": "Sergey Yurgenson",
+        "email": "sergey_yurgenson@hms.harvard.edu"
+      }
+    ]
+  },
+  "gmail.com": {
+    "patterns": [
+      "contains_last_and_fi"
+    ],
+    "examples": [
+      {
+        "name": "Justyna Zander",
+        "email": "dr.justyna.zander@gmail.com"
+      }
+    ]
+  },
+  "duke.edu": {
+    "patterns": [
+      "first.last"
+    ],
+    "examples": [
+      {
+        "name": "Miroslav Pajic",
+        "email": "miroslav.pajic@duke.edu"
       }
     ]
   }

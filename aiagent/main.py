@@ -19,14 +19,15 @@ from openai import OpenAI
 # Konfiguration
 # ─────────────────────────────────────────────────────────────────────────────
 load_dotenv()
-client = OpenAI()
+# kurze Timeouts vermeiden „hängende“ Calls
+client = OpenAI(timeout=20)
 
 INPUT_CSV = "list_of_names_and_affiliations.csv"   # zweispaltig: Name | Institution (ohne Header)
 OUTPUT_CSV = "emails_ai_agent.csv"                 # 3 Spalten: Name | Institution | E-Mail
 RUNS_LOG = "runs.jsonl"                            # strukturierte Schritt-Logs
 
-MEM_DOMAINS = "memory_domains.json"                # {institution: {"domains": [...], "directory_hints": [...]} }
-MEM_PATTERNS = "memory_patterns.json"              # {domain: {"patterns": ["first.last", "f.last", ...], "examples":[{"name":..,"email":..}] } }
+MEM_DOMAINS = "memory_domains.json"                # {institution: {"domains": [...], "directory_hints": [...] } }
+MEM_PATTERNS = "memory_patterns.json"              # {domain: {"patterns": [...], "examples":[{"name":..,"email":..}] } }
 
 USER_AGENT = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -37,11 +38,15 @@ REQUEST_TIMEOUT = 15
 # Budget / Limits
 MAX_SEARCH_RESULTS = 10
 MAX_PAGES_TO_SCAN = 8       # harte Obergrenze pro Person (Sense-Act Loop)
-SLEEP_BETWEEN_REQUESTS = (1.0, 2.5)
+SLEEP_BETWEEN_REQUESTS = (5.0, 8.0)  # zwischen Seiten-Fetches
+SLEEP_BETWEEN_QUERIES = (5.0, 8.0)   # zwischen Such-Queries
 JUDGE_VOTES = 3             # Self-Consistency
 ACCEPT_CONF_PERSONAL = 0.60
 ACCEPT_CONF_ROLE = 0.80
 ACCEPT_CONF_UNCERTAIN = 0.85
+
+# Optionaler Such-Fallback
+USE_BING_FALLBACK = True
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Utility: CSV I/O
@@ -59,9 +64,10 @@ def read_two_col_csv(path: str) -> List[Tuple[str, str]]:
                 rows.append((name, inst))
     return rows
 
+
 def write_results_csv(rows: List[Dict[str, str]], path: str) -> None:
     # exakt 3 Spalten
-    df = pd.DataFrame(rows, columns=["Name", "Institution", "E-Mail"])
+    df = pd.DataFrame(rows, columns=["Name + Institution", "E-Mail"])
     df.to_csv(path, index=False)
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -76,11 +82,13 @@ def load_json(path: str, default: Any) -> Any:
         pass
     return default
 
+
 def save_json(path: str, data: Any) -> None:
     tmp = path + ".tmp"
     with open(tmp, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
     os.replace(tmp, path)
+
 
 def memo_domains_add(memory: dict, institution: str, domain_or_hint: str) -> None:
     if not institution:
@@ -92,6 +100,7 @@ def memo_domains_add(memory: dict, institution: str, domain_or_hint: str) -> Non
     else:
         if domain_or_hint not in entry["directory_hints"]:
             entry["directory_hints"].append(domain_or_hint)
+
 
 def memo_patterns_add(memory: dict, email: str, name: str) -> None:
     try:
@@ -107,6 +116,7 @@ def memo_patterns_add(memory: dict, email: str, name: str) -> None:
     ex = {"name": name, "email": email}
     if ex not in dom_entry["examples"]:
         dom_entry["examples"].append(ex)
+
 
 def infer_pattern(local: str, toks: List[str]) -> Optional[str]:
     """Grobe Musterkennung für den lokalen Teil; rein informativ für Memory."""
@@ -134,32 +144,126 @@ def infer_pattern(local: str, toks: List[str]) -> Optional[str]:
 def log_jsonl(path: str, record: dict) -> None:
     record = dict(record)
     record["ts"] = time.time()
-    with open(path, "a", encoding="utf-8") as f:
-        f.write(json.dumps(record, ensure_ascii=False) + "\n")
+    try:
+        with open(path, "a", encoding="utf-8") as f:
+            f.write(json.dumps(record, ensure_ascii=False) + "\n")
+    except Exception:
+        pass  # Logging darf nie die Pipeline sprengen
 
 # ─────────────────────────────────────────────────────────────────────────────
-# Suche / Fetch (neutrale Werkzeuge, keine Blacklists)
+# Suche / Fetch (robuster mit Fallbacks)
 # ─────────────────────────────────────────────────────────────────────────────
+def _unwrap_ddg_href(href: str) -> Optional[str]:
+    """Extrahiert die echte URL aus DuckDuckGo-Links (uddg=) oder gibt direkte http(s)-Links zurück."""
+    try:
+        if "uddg=" in href:
+            parsed = urllib.parse.urlparse(href)
+            qs = urllib.parse.parse_qs(parsed.query)
+            uddg = qs.get("uddg", [""])[0]
+            if uddg.startswith("http"):
+                return uddg
+        if href.startswith("http://") or href.startswith("https://"):
+            return href
+    except Exception:
+        return None
+    return None
+
+
+def _ddg_search_robust(query: str, max_results: int) -> List[str]:
+    """Mehrere DDG-HTML-Varianten + breitere Extraktion."""
+    session = requests.Session()
+    headers = {
+        "User-Agent": USER_AGENT,
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.9,de;q=0.8",
+        "Referer": "https://duckduckgo.com/",
+    }
+    endpoints = [
+        ("https://duckduckgo.com/html/", "a.result__a"),
+        ("https://html.duckduckgo.com/html/", "a.result__a"),
+        ("https://duckduckgo.com/lite/", "a[href]"),
+    ]
+    urls_out: List[str] = []
+    errors: List[str] = []
+
+    for base, selector in endpoints:
+        try:
+            resp = session.get(
+                base, params={"q": query}, headers=headers,
+                timeout=REQUEST_TIMEOUT, allow_redirects=True
+            )
+            text = resp.text
+            low = text.lower()
+            if ("captcha" in low) or ("not a robot" in low) or ("enable javascript" in low):
+                errors.append(f"{base} looks like a bot-check/captcha")
+                continue
+
+            soup = BeautifulSoup(text, "html.parser")
+            anchors = soup.select(selector)
+            if not anchors:
+                anchors = soup.find_all("a", href=True)
+
+            for a in anchors:
+                href = a.get("href") or ""
+                u = _unwrap_ddg_href(href)
+                if u and u not in urls_out:
+                    urls_out.append(u)
+                if len(urls_out) >= max_results:
+                    break
+
+            if urls_out:
+                break
+
+            log_jsonl(RUNS_LOG, {
+                "step": "search_debug_empty",
+                "endpoint": base,
+                "status": resp.status_code,
+                "len_html": len(text),
+                "hint": "no anchors matched; possibly regional HTML variant or bot page",
+                "query": query
+            })
+        except Exception as e:
+            errors.append(f"{base} error: {e}")
+
+    if not urls_out and errors:
+        log_jsonl(RUNS_LOG, {"step": "search_errors", "query": query, "errors": errors})
+    return urls_out
+
+
+def _bing_search(query: str, max_results: int) -> List[str]:
+    """Sehr einfacher Bing-Fallback für Tests (kann brechen, aber oft ausreichend)."""
+    try:
+        url = "https://www.bing.com/search"
+        headers = {"User-Agent": USER_AGENT, "Accept-Language": "en-US,en;q=0.9,de;q=0.8"}
+        r = requests.get(url, params={"q": query}, headers=headers, timeout=REQUEST_TIMEOUT)
+        r.raise_for_status()
+        soup = BeautifulSoup(r.text, "html.parser")
+        out: List[str] = []
+        for a in soup.select("li.b_algo h2 a[href]"):
+            href = a.get("href")
+            if href and href.startswith("http") and href not in out:
+                out.append(href)
+            if len(out) >= max_results:
+                break
+        return out
+    except Exception as e:
+        log_jsonl(RUNS_LOG, {"step": "bing_error", "query": query, "error": str(e)})
+        return []
+
+
 def ddg_search(query: str, max_results: int = MAX_SEARCH_RESULTS) -> List[str]:
-    """HTML-Variante von DuckDuckGo – dient dem Agenten als Fetch-Tool.
-    (Wir lassen GPT die Queries/Seed-Links planen; DDG ist nur die ausführende Suche.)"""
-    url = "https://html.duckduckgo.com/html/?q=" + urllib.parse.quote(query)
-    headers = {"User-Agent": USER_AGENT}
-    resp = requests.get(url, headers=headers, timeout=REQUEST_TIMEOUT)
-    resp.raise_for_status()
-    soup = BeautifulSoup(resp.text, "html.parser")
+    """
+    Robuste DuckDuckGo-HTML-Suche mit Fallbacks und Pause zwischen Abfragen.
+    Liefert externe Ziel-URLs (ent-wrapped aus ?uddg=).
+    """
+    urls = _ddg_search_robust(query, max_results)
+    if not urls and USE_BING_FALLBACK:
+        urls = _bing_search(query, max_results)
 
-    urls: List[str] = []
-    for a in soup.select(".result__a"):
-        href = a.get("href") or ""
-        parsed = urllib.parse.urlparse(href)
-        q = urllib.parse.parse_qs(parsed.query)
-        uddg = q.get("uddg", [""])[0]
-        if uddg.startswith("http"):
-            urls.append(uddg)
-        if len(urls) >= max_results:
-            break
+    # Pause zwischen zwei Such-Queries (gegen Rate-Limits/Bot-Erkennung)
+    time.sleep(random.uniform(*SLEEP_BETWEEN_QUERIES))
     return urls
+
 
 def fetch_page(url: str) -> Tuple[str, str]:
     headers = {"User-Agent": USER_AGENT, "Accept-Language": "en,de;q=0.9"}
@@ -192,6 +296,7 @@ def sanitize_email(raw: str) -> str:
         return ""
     return email if RE_EMAIL.fullmatch(email) else ""
 
+
 def extract_emails_from_text_and_html(text: str, html: str) -> List[str]:
     found = set()
     # direkte
@@ -216,8 +321,10 @@ def extract_emails_from_text_and_html(text: str, html: str) -> List[str]:
 def tokenize_name(name: str) -> List[str]:
     return [t.lower() for t in re.split(r"[\s\-]+", name) if t.strip()]
 
+
 def email_local(email: str) -> str:
     return email.split("@", 1)[0].lower()
+
 
 def domain_of(url_or_email: str) -> str:
     if "@" in url_or_email:
@@ -228,10 +335,11 @@ def domain_of(url_or_email: str) -> str:
     except Exception:
         return ""
 
-def proximity_scores(text: str, name: str, candidates: list[str]) -> dict:
+
+def proximity_scores(text: str, name: str, candidates: List[str]) -> Dict[str, int]:
     t = text.lower()
     pos_name = t.find(name.lower())
-    scores = {}
+    scores: Dict[str, int] = {}
     for c in candidates:
         pos_mail = t.find(c.lower())
         if pos_name != -1 and pos_mail != -1:
@@ -240,15 +348,16 @@ def proximity_scores(text: str, name: str, candidates: list[str]) -> dict:
             scores[c] = 10_000_000
     return scores
 
+
 def build_candidate_features(
         name: str,
         institution: str,
         page_url: str,
         text: str,
-        candidates: list[str],
+        candidates: List[str],
         mem_domains: dict,
         mem_patterns: dict
-) -> list[dict]:
+) -> List[dict]:
     toks = tokenize_name(name)
     last = toks[-1] if toks else ""
     initials = "".join(t[0] for t in toks) if toks else ""
@@ -324,22 +433,35 @@ Bevorzuge institutionelle Domains.
     plan.setdefault("seed_urls", [])
     return plan
 
-def gpt_judge_once(name: str, institution: str, page_url: str, page_text: str, features: list[dict]) -> dict:
+
+def _coerce_to_candidate(chosen: str, candidates: List[str]) -> str:
+    """Erzwinge, dass der Judge NUR eine der extrahierten Kandidaten-Mails zurückgibt."""
+    cl = (chosen or "").strip().lower()
+    for c in candidates:
+        if c.strip().lower() == cl:
+            return c  # Originalschreibweise beibehalten
+    return ""       # nicht in Kandidaten → verwerfen
+
+
+def gpt_judge_once(name: str, institution: str, page_url: str, page_text: str, features: List[dict]) -> dict:
     """Ein einzelnes Urteil (ohne Self-Consistency)."""
-    if not features:
+    cand_list = [f.get("email", "") for f in features if f.get("email")]
+    if not cand_list:
         return {"chosen_email":"", "classification":"uncertain", "confidence":0.0, "reason":"No candidates"}
     context = page_text[:3500]
     system = (
         "Du bist ein akribischer E-Mail-Judge-Agent. "
-        "Entscheide, ob eine E-Mail eine PERSONEN-Adresse (individuell) oder ROLLEN-Adresse ist. "
-        "Wähle genau EINE E-Mail NUR, wenn sie plausibel der gesuchten Person zuzuordnen ist. "
-        "Wenn offenbar nur Rollenadressen existieren und die Seite das nahelegt, darfst du eine Rollenadresse wählen. "
+        "Wähle EXAKT EINE E-Mail NUR aus der Kandidatenliste. "
+        "Wenn keine Kandidatin plausibel ist, lass 'chosen_email' leer. "
         "Antworte als JSON."
     )
     user = f"""
 Gesuchte Person: {name}
 Institution: {institution}
 Seite: {page_url}
+
+Kandidatenliste (NUR diese verwenden):
+{json.dumps(cand_list, ensure_ascii=False, indent=2)}
 
 Kandidaten mit Features:
 {json.dumps(features, ensure_ascii=False, indent=2)}
@@ -357,7 +479,7 @@ Kriterien:
 5) Wenn unklar: keine E-Mail.
 
 JSON-Felder:
-- chosen_email (string),
+- chosen_email (string; MUSS aus der Kandidatenliste stammen),
 - classification ("personal" | "role" | "uncertain"),
 - confidence (0..1),
 - reason (kurz).
@@ -372,15 +494,26 @@ JSON-Felder:
         raw = (resp.choices[0].message.content or "").strip()
         data = json.loads(raw)
     except Exception as e:
-        # heuristische Rettung
+        # heuristische Rettung (meistens leer lassen)
         emails = RE_EMAIL.findall(locals().get("raw",""))
         data = {
             "chosen_email": sanitize_email(emails[0]) if emails else "",
             "classification": "uncertain",
-            "confidence": 0.4 if emails else 0.0,
+            "confidence": 0.0,
             "reason": f"Non-JSON/parse issue: {e}"
         }
-    data["chosen_email"] = sanitize_email(data.get("chosen_email","") or "") or ""
+
+    # erzwinge Kandidaten-Bindung + sanitizen
+    data["chosen_email"] = sanitize_email(data.get("chosen_email","") or "")
+    coerced = _coerce_to_candidate(data["chosen_email"], cand_list)
+    if not coerced and data.get("chosen_email"):
+        log_jsonl(RUNS_LOG, {
+            "step": "judge_chosen_not_in_candidates",
+            "chosen_email": data["chosen_email"],
+            "candidates": cand_list[:20]
+        })
+    data["chosen_email"] = coerced
+
     data["classification"] = data.get("classification","uncertain")
     try:
         data["confidence"] = float(data.get("confidence", 0.0) or 0.0)
@@ -388,6 +521,7 @@ JSON-Felder:
         data["confidence"] = 0.0
     data["reason"] = data.get("reason","")
     return data
+
 
 def gpt_judge_consensus(name, institution, page_url, page_text, features, votes=JUDGE_VOTES) -> dict:
     """Self-Consistency über n Urteile; Mehrheitswahl + mittlere Confidence."""
@@ -416,8 +550,22 @@ def gpt_judge_consensus(name, institution, page_url, page_text, features, votes=
     reason = "Consensus: " + " | ".join(reasons[:3]) if reasons else "Consensus of multiple votes."
     return {"chosen_email": winner_email, "classification": cls, "confidence": float(avg_conf), "reason": reason}
 
-def gpt_reflect(name: str, institution: str, page_url: str, features: list[dict], verdict: dict) -> dict:
+
+def _pick_features_for_reflect(features: List[dict], verdict: dict, max_items: int = 10) -> List[dict]:
+    """Sorge dafür, dass das Feature der gewählten Mail IMMER im Reflektor-Kontext enthalten ist."""
+    chosen = (verdict.get("chosen_email") or "").strip().lower()
+    chosen_feats = [f for f in features if f.get("email","").strip().lower() == chosen]
+    others = [f for f in features if f.get("email","").strip().lower() != chosen]
+    out: List[dict] = []
+    if chosen_feats:
+        out.append(chosen_feats[0])
+    out.extend(others[: max(0, max_items - len(out))])
+    return out
+
+
+def gpt_reflect(name: str, institution: str, page_url: str, features: List[dict], verdict: dict) -> dict:
     """Reflektor-Agent prüft, ob das Urteil ausreichend begründet/sicher ist oder ob wir weitersuchen sollen."""
+    feats_for_reflect = _pick_features_for_reflect(features, verdict, max_items=10)
     system = (
         "Du bist ein kritischer Reflektor-Agent. Prüfe das Urteil eines Judge-Agents "
         "auf Plausibilität und entscheide: 'accept' oder 'continue'. Antworte als JSON."
@@ -427,8 +575,8 @@ Person: {name}
 Institution: {institution}
 Seite: {page_url}
 
-Features (gekürzt):
-{json.dumps(features[:6], ensure_ascii=False, indent=2)}
+Features (inkl. der gewählten E-Mail):
+{json.dumps(feats_for_reflect, ensure_ascii=False, indent=2)}
 
 Urteil:
 {json.dumps(verdict, ensure_ascii=False, indent=2)}
@@ -519,7 +667,7 @@ def try_links_for_person(name: str, institution: str, links: List[str], used_q: 
             # Reflexions-Check
             reflect = gpt_reflect(name, institution, url, feats, verdict)
             print(f"🪞 Reflection: {reflect.get('action')} | {reflect.get('reason')}")
-            log_jsonl(RUNS_LOG, {"step":"reflect", "name":name, "institution":institution, "url":url, "reflection":reflect})
+            log_jsonl(RUNS_LOG, {"step":"reflect", "name":"{name}", "institution":institution, "url":url, "reflection":reflect})
 
             if reflect.get("action") == "accept":
                 duration = time.time() - t0
@@ -536,20 +684,22 @@ def try_links_for_person(name: str, institution: str, links: List[str], used_q: 
 
     return None
 
+
 def process_person(name: str, institution: str,
                    mem_domains: dict, mem_patterns: dict) -> Tuple[str, str, str, float]:
     t0 = time.time()
     print(f"\n➡️  {name} | {institution}")
-
+    time.sleep(random.uniform(*SLEEP_BETWEEN_REQUESTS))
     # 1) Searcher-Agent: Plan + Seed-Links
     plan = gpt_propose_links_and_plan(name, institution, mem_domains)
     seed_links = plan.get("seed_urls", [])[:8]
     phases = plan.get("phases", [])
 
     # 1a) Seed-Links zuerst
-    res = try_links_for_person(name, institution, seed_links, "gpt_seed", mem_domains, mem_patterns, t0)
-    if res:
-        return res
+    if seed_links:
+        res = try_links_for_person(name, institution, seed_links, "gpt_seed", mem_domains, mem_patterns, t0)
+        if res:
+            return res
 
     # 2) Phasengetriebene Queries (der Agent hat sie vorgeschlagen)
     for phase in phases:
@@ -587,6 +737,7 @@ def main():
     print(f"📄 Eingelesen: {len(people)} Einträge aus {INPUT_CSV}")
 
     for idx, (name, inst) in enumerate(people, start=1):
+
         email, src, used_q, dur = process_person(name, inst, mem_domains, mem_patterns)
 
         # Log (sichtbar): Quelle/Query/Dauer
@@ -600,7 +751,7 @@ def main():
         print(f"⏱️ Dauer: {dur:.2f}s")
 
         # Ergebnis-CSV: exakt 3 Spalten
-        results.append({"Name": name, "Institution": inst, "E-Mail": email})
+        results.append({"Name + Institution": name + " " + inst, "E-Mail": email})
 
         # Structured Log
         log_jsonl(RUNS_LOG, {
