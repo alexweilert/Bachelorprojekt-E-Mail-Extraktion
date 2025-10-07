@@ -1,7 +1,6 @@
-package Klassische_Pipeline
+package main
 
 import (
-	Klassische_Pipeline2 "Bachelorprojekt/Klassische Pipeline"
 	"encoding/csv"
 	"os"
 	"strings"
@@ -84,7 +83,7 @@ func ReadCSV(filepath string) ([]PersonEntry, error) {
 	return entries, nil
 }
 
-func WriteCSV(outputFile string, results []Klassische_Pipeline2.ResultRow) error {
+func WriteCSV(outputFile string, results []ResultRow) error {
 	file, err := os.Create(outputFile)
 	if err != nil {
 		return err

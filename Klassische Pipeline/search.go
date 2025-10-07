@@ -1,4 +1,4 @@
-package Klassische_Pipeline
+package main
 
 import (
 	"context"
