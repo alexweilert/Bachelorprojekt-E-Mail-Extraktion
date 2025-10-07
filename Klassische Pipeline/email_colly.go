@@ -50,7 +50,6 @@ func ExtractEmailWithColly(url string, name string) (string, int, error) {
 			checkAndAddEmail(match)
 		}
 		// 1b) SYMBOLISCHE Erkennung im sichtbaren Text
-		//for _, em := range extractSymbolicEmails(e.Text) {
 		for _, em := range extractSymbolicEmailsStrict(e.Text, org) {
 			checkAndAddEmail(em)
 		}
@@ -70,7 +69,6 @@ func ExtractEmailWithColly(url string, name string) (string, int, error) {
 			checkAndAddEmail(match)
 		}
 		// 3b) SYMBOLISCHE Erkennung im HTML (falls Text nicht gereicht hat)
-		//for _, em := range extractSymbolicEmails(rawHTML) {
 		for _, em := range extractSymbolicEmailsStrict(rawHTML, org) {
 			checkAndAddEmail(em)
 		}

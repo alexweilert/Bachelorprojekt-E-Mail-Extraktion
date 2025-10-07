@@ -69,15 +69,6 @@ func DuckDuckGoPDFSearch(query string) ([]string, error) {
 	return duckDuckGoSearch(query, opts)
 }
 
-/*
-// Wie bisher: nur PDF-Links → URLs
-func DuckDuckGoPDFSearch(query string) ([]string, error) {
-	opts := defaultDDGOptions()
-	opts.PDFOnly = true
-	return duckDuckGoSearch(query, opts)
-}
-*/
-
 // -------- Kernsuche --------
 
 func duckDuckGoSearch(query string, opts ddgOptions) ([]string, error) {

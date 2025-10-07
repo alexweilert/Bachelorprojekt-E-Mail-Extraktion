@@ -2,25 +2,12 @@ package main
 
 import (
 	"golang.org/x/net/publicsuffix"
-	"golang.org/x/text/transform"
-	"golang.org/x/text/unicode/norm"
 	"net"
 	"regexp"
 	"strings"
 	"sync"
 	"time"
-	"unicode"
 )
-
-// ---------- Normalisierung & Zerlegung ----------
-func normalizeASCII(s string) string {
-	// Diakritika raus; Umlaute konservativ umschreiben; Interpunktionsrauschen entfernen
-	rep := strings.NewReplacer("ä", "ae", "ö", "oe", "ü", "ue", "Ä", "ae", "Ö", "oe", "Ü", "ue", "ß", "ss", "’", "", "'", "", "–", "-", "—", "-")
-	s = rep.Replace(s)
-	t := transform.Chain(norm.NFD, transform.RemoveFunc(func(r rune) bool { return unicode.Is(unicode.Mn, r) }), norm.NFC)
-	out, _, _ := transform.String(t, s)
-	return strings.ToLower(strings.TrimSpace(out))
-}
 
 // Entfernt gängige Suchzusätze (contact/email/address …), damit die Org-Erkennung nicht leidet.
 func cleanQueryNoise(s string) string {
@@ -340,29 +327,6 @@ func extractEmailFromText(s string) string {
 	return match
 }
 
-/*
-// Zieht die erste valide E-Mail AUS einem String heraus (auch wenn außen noch Text klebt)
-func extractEmailFromText(s string) string {
-	s = strings.TrimSpace(s)
-	s = strings.ReplaceAll(s, "mailto:", "")
-	s = strings.Trim(s, "<> \t\n\r\"',.;:[]{}")
-
-	re := regexp.MustCompile(`(?i)[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}`)
-	match := re.FindString(s) // <— WICHTIG: FindString, nicht MatchString
-	if match == "" {
-		return ""
-	}
-	// generisch nach TLD sauber abschneiden
-	match = truncateEmailAfterTLD(match)
-
-	// Minimalprüfung (kein Leerzeichen, genau 1 @)
-	if strings.Count(match, "@") != 1 || strings.Contains(match, " ") {
-		return ""
-	}
-	return match
-}
-*/
-
 // Trunkiert alles nach einer gültigen Domain-Endung (mind. 2 Buchstaben).+
 func truncateEmailAfterTLD(email string) string {
 	tldPattern := regexp.MustCompile(`(?i)(@[a-z0-9.\-]+\.[a-z]{2,})`)
@@ -401,39 +365,6 @@ func validDomain(domain string) bool {
 	}
 	return true
 }
-
-/*
-// NEU: stricte Domain-Validierung (generisch)
-func validDomain(domain string) bool {
-	domain = strings.ToLower(strings.TrimSpace(domain))
-	if strings.Count(domain, ".") < 1 {
-		return false
-	}
-	labels := strings.Split(domain, ".")
-	for _, L := range labels {
-		if L == "" || len(L) > 63 {
-			return false
-		}
-		// nur a–z, 0–9, '-' und nicht mit '-' beginnen/enden
-		if !regexp.MustCompile(`^[a-z0-9-]+$`).MatchString(L) {
-			return false
-		}
-		if strings.HasPrefix(L, "-") || strings.HasSuffix(L, "-") {
-			return false
-		}
-	}
-	// TLD ≥2 Zeichen
-	last := labels[len(labels)-1]
-	if len(last) < 2 {
-		return false
-	}
-	// publicsuffix: eTLD+1 ermitteln (hilft gegen "ionforsafetyarguments.thisissue...")
-	if etld1, err := publicsuffix.EffectiveTLDPlusOne(domain); err != nil || etld1 == "" {
-		return false
-	}
-	return true
-}
-*/
 
 // --- very fast MX with cache & tiny timeout (filters nonsense domains) ---
 var mxCache sync.Map
